@@ -1,0 +1,508 @@
+:root {
+    --bg-color: #f8fafc;
+    --card-bg: #f1f5f9;
+    --card-border: rgba(0, 0, 0, 0.1);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-blue: #64748b;
+    --accent-blue-hover: #475569;
+    --accent-green: #10b981;
+    --accent-green-hover: #059669;
+    --accent-red: #ef4444;
+    --accent-yellow: #f59e0b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+}
+
+.kds-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+/* Header */
+.kds-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--card-border);
+    padding: 1rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.badge {
+    background: rgba(100, 116, 139, 0.2);
+    color: var(--text-primary);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+.stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+#pending-count {
+    color: var(--accent-yellow);
+}
+
+#cooking-count {
+    color: var(--accent-green);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.time-display {
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+}
+
+/* Kanban Board Layout */
+.kanban-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.column {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+}
+
+.column-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.column-header h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.column-header .count {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+/* Lists and Scrolling */
+.ticket-list {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Custom Scrollbar */
+.ticket-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ticket-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+}
+
+.ticket-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Order Tickets */
+.ticket {
+    background: var(--card-bg);
+    border: 3px solid #969696;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    height: 380px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.ticket:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.ticket:active {
+    transform: scale(0.98);
+}
+
+.ticket.status-pending {
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.ticket.status-cooking {
+    border-color: var(--accent-green);
+}
+
+.ticket.status-ready {
+    border-color: #86efac;
+}
+
+.ticket.priority-rush {
+    border-color: var(--accent-red) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.ticket.clicked {
+    border-color: var(--text-secondary) !important;
+}
+
+/* Ticket contents */
+.ticket-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    gap: 0.4rem;
+}
+
+.order-id {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.ticket-time {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+.ticket.priority-rush .ticket-time {
+    color: var(--accent-red);
+    background: rgba(239, 68, 68, 0.15);
+    animation: flash 2s infinite;
+}
+
+@keyframes flash {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.server-name {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.ticket-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.ticket-items::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ticket-items::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.ticket-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+}
+
+.item-qty {
+    color: var(--accent-yellow);
+    font-weight: 700;
+    min-width: 24px;
+    background: rgba(245, 158, 11, 0.15);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    text-align: center;
+    height: fit-content;
+    margin-right: 8px;
+}
+
+.item-name {
+    flex-grow: 1;
+    line-height: 1.4;
+}
+
+.item-notes {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--accent-red);
+    margin-top: 0.3rem;
+    font-style: italic;
+}
+
+/* Call to Action Buttons */
+.ticket-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    flex: 1;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--text-secondary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Column Specific Styling & Button Text */
+#col-pending .btn-primary {
+    background: var(--text-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#col-pending .btn-primary:hover {
+    background: var(--text-primary);
+}
+
+#col-pending .btn-primary::after {
+    content: 'Start Cooking';
+}
+
+#col-cooking .btn-primary {
+    background: var(--accent-green);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+#col-cooking .btn-primary:hover {
+    background: var(--accent-green-hover);
+}
+
+#col-cooking .btn-primary::after {
+    content: 'Ready to Serve';
+}
+
+#col-ready .ticket {
+    opacity: 0.85;
+    filter: grayscale(0%);
+}
+
+#col-ready .ticket:hover {
+    opacity: 1;
+}
+
+#col-ready .btn-primary {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+#col-ready .btn-primary:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#col-ready .btn-primary::after {
+    content: 'Archive / Complete';
+}
+
+.mobile-nav {
+    display: none;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: -0.5rem;
+}
+
+.nav-tab {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.nav-tab.active {
+    background: var(--text-secondary);
+    color: white;
+}
+
+.column-body {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.mini-map {
+    width: 45px;
+    background: rgba(0, 0, 0, 0.02);
+    border-left: 1px solid var(--card-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+    gap: 0.4rem;
+}
+
+.mini-map::-webkit-scrollbar {
+    display: none;
+}
+
+.mini-map-item {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--text-secondary);
+    cursor: pointer;
+    background: white;
+    width: 30px;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.mini-map-item:hover {
+    background: var(--text-primary);
+    color: white;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+    .mobile-nav {
+        display: flex;
+    }
+
+    .kanban-board {
+        display: block;
+        overflow: hidden;
+    }
+
+    .column {
+        display: none;
+        height: 100%;
+    }
+
+    .kanban-board.active-pending #col-pending,
+    .kanban-board.active-cooking #col-cooking,
+    .kanban-board.active-ready #col-ready {
+        display: flex;
+    }
+}

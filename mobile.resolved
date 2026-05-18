@@ -1,0 +1,89 @@
+# Mobile: About Scroll Reveals + Menu Restructure
+
+Two mobile-only (`max-width: 768px`) changes are scoped so desktop is not affected.
+
+---
+
+## Proposed Changes
+
+### 1. About Section — Snap-scroll Group Reveals
+
+The 5 bento items will be split into **3 reveal groups** that animate in sequence as the user scrolls through the about section. To make it feel like snap-scroll (lively, section-by-section), the section will remain `100vh` on mobile but scroll internally, with each group pinned to the center as it fades/slides in.
+
+**Groups:**
+| Group | Elements | Animation |
+|-------|----------|-----------|
+| 1 | Title + "Our Story" label | Slide up from bottom |
+| 2 | First video + Heritage info box | Slide in from left |
+| 3 | Description text + Second video | Slide up from bottom |
+
+**Implementation:** Use `ScrollTrigger` with `pin: true` inside the about section on mobile. Each group will use `toggleActions: "play none none reverse"` for bi-directional feel. The about section height will be extended to `~250vh` on mobile to give scroll room, with the inner content appearing pinned at the center.
+
+---
+
+#### [MODIFY] [index.html](file:///c:\Users\Administrator\Desktop\pizza\index.html)
+- Wrap each bento group in a `<div class="about-reveal-group">` wrapper with data-group index
+- No structural change to desktop layout
+
+#### [MODIFY] [style.css](file:///c:\Users\Administrator\Desktop\pizza\style.css)
+- Under `@media (max-width: 768px)`: hide all groups by default (`opacity: 0, transform: translateY(60px)`), let GSAP drive visibility
+- About section becomes a tall scroll track (`height: 250vh`) with pinned inner content container
+
+#### [MODIFY] [script.js](file:///c:\Users\Administrator\Desktop\pizza\script.js)
+- Add `isMobile()` helper (`window.innerWidth <= 768`)
+- In [initScrollAnimations()](file:///c:/Users/Administrator/Desktop/pizza/script.js#48-114), if mobile: loop over `.about-reveal-group` elements and create staggered `ScrollTrigger` per group using `scrub` + `pin`
+
+---
+
+### 2. Flavor Sections — Mobile Layout Restructure
+
+**New layout (top → bottom):**
+```
+[ Category text — left side, vertical ]
+[ Product Name — top center ]
+[ Price — large stroke text, layered above image ]
+[ Product Image — center, slides in from right ]
+[ Ingredients — bottom ]
+```
+
+**Key points:**
+- Category label moves from the fixed center indicator to inline inside the section on mobile
+- Price is a `data-price` attribute on the section (needs to be added to HTML), rendered as large outlined/stroked text behind-but-over the image using `z-index`
+- Image slides in from the right instead of from below
+- All changes scoped to mobile only via `@media (max-width: 768px)`
+
+#### [MODIFY] [index.html](file:///c:\Users\Administrator\Desktop\pizza\index.html)
+- Add `data-price="1200 DZD"` to each `flavor-section`
+- Inside `.flavor-layout` add:
+  - `.mobile-product-name` (hidden on desktop)
+  - `.mobile-price` (hidden on desktop)
+  - `.mobile-category` (hidden on desktop)
+  - These are populated by JS on load for mobile
+
+#### [MODIFY] [style.css](file:///c:\Users\Administrator\Desktop\pizza\style.css)
+- Under `@media (max-width: 768px)`:
+  - `.flavor-layout`: `flex-direction: column`, centered, full height
+  - `.mobile-product-name`: top, large font
+  - `.mobile-price`: absolute center of image container, very large stroked font (`-webkit-text-stroke`), `z-index: 5`
+  - `.floating-img`: `z-index: 3` (behind price stroke)
+  - `.mobile-category`: rotated 90deg on the left side
+
+#### [MODIFY] [script.js](file:///c:\Users\Administrator\Desktop\pizza\script.js)
+- On mobile, inject `.mobile-product-name`, `.mobile-price`, `.mobile-category` elements into each `.flavor-section` from `data-*` attributes
+- Change [initFlavorAnimations()](file:///c:/Users/Administrator/Desktop/pizza/script.js#323-351) to slide image from `x: 120%` (right) instead of `y: 50` on mobile
+
+---
+
+## Verification Plan
+
+### Manual Verification
+1. Open [index.html](file:///c:/Users/Administrator/Desktop/pizza/index.html) in a browser (can use Live Server or just open the file)
+2. Open DevTools → toggle device toolbar → set to iPhone 14 (390×844) or similar
+3. **About section**: Scroll past the hero — verify each group of elements reveals one at a time with a lively animation feel
+4. **Flavor section**: Scroll to menu — verify:
+   - Product name is at the top
+   - Category label is on the left side (rotated)
+   - Image enters from the right
+   - Price text is visible over/on top of image with stroke style
+   - Ingredients are at the bottom
+5. Switch back to desktop width (1440px) — verify **nothing changed** on desktop

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slice of Heaven | Kitchen Display System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cuisine.css">
+</head>
+
+<body>
+    <div class="kds-container">
+        <!-- HEADER -->
+        <header class="kds-header" style="justify-content: center;">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="pending-count">0</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="cooking-count">0</span>
+                    <span class="stat-label">Cooking</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- MOBILE NAV -->
+        <div class="mobile-nav">
+            <button class="nav-tab active" onclick="switchTab('pending')">Incoming</button>
+            <button class="nav-tab" onclick="switchTab('cooking')">In Progress</button>
+            <button class="nav-tab" onclick="switchTab('ready')">Ready</button>
+        </div>
+
+        <!-- KANBAN BOARD -->
+        <main class="kanban-board active-pending">
+            <!-- Pending Orders Column -->
+            <div class="column" id="col-pending">
+                <div class="column-header">
+                    <h2>Incoming <span class="count">0</span></h2>
+                </div>
+                <div class="column-body">
+                    <div class="ticket-list" id="list-pending"></div>
+                    <div class="mini-map" id="map-pending"></div>
+                </div>
+            </div>
+
+            <!-- In Progress Orders Column -->
+            <div class="column" id="col-cooking">
+                <div class="column-header">
+                    <h2>In Progress <span class="count">0</span></h2>
+                </div>
+                <div class="column-body">
+                    <div class="ticket-list" id="list-cooking"></div>
+                    <div class="mini-map" id="map-cooking"></div>
+                </div>
+            </div>
+
+            <!-- Ready Orders Column -->
+            <div class="column" id="col-ready">
+                <div class="column-header">
+                    <h2>Ready <span class="count">0</span></h2>
+                </div>
+                <div class="column-body">
+                    <div class="ticket-list" id="list-ready"></div>
+                    <div class="mini-map" id="map-ready"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="cuisine.js"></script>
+</body>
+
+</html>
