@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <title>Crumbly</title>
+    <link rel="stylesheet" href="style1.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+
+<body>
+    <div id="Category-Container">
+        <div class="Category-Item" data-color="#D4A373" data-category="Cookies">
+            <div class="Main-Category-Content">
+                <p class="Category-Name">COOKIES</p>
+            </div>
+        </div>
+        <div class="Category-Item" data-color="#B5CFB7" data-category="Ice Cream">
+            <div class="Main-Category-Content">
+                <p class="Category-Name">ICE CREAM</p>
+            </div>
+        </div>
+        <div class="Category-Item" data-color="#C9B1FF" data-category="Drinks">
+            <div class="Main-Category-Content">
+                <p class="Category-Name">DRINKS</p>
+            </div>
+        </div>
+        <div class="Category-Item" data-color="#FFB3C6" data-category="Macarons">
+            <div class="Main-Category-Content">
+                <p class="Category-Name">MACARONS</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="Detail-View">
+        <div id="Background-Tint"></div>
+        <div id="Floating-BG-Container"></div>
+        <img src="./goback.svg" alt="" id="Close-Btn">
+        <div id="Detail-List">
+            <!-- Items will be injected here by script.js -->
+        </div>
+    </div>
+
+    <script src="script1.js"></script>
+</body>
+
+</html>
