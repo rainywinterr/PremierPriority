@@ -53,27 +53,6 @@ closeBtn.addEventListener('click', () => {
     }, 500);
 });
 
-function animTextInItem(item, dir) {
-    if (typeof gsap === 'undefined') return;
-    const texts = Array.from(item.querySelectorAll('.Price, .Ingredient'));
-    if (dir === 'up') {
-        texts.reverse();
-    }
-    gsap.fromTo(texts,
-        {
-            y: dir === 'down' ? 30 : -30,
-            clipPath: dir === 'down' ? 'inset(0% 0% 100% 0%)' : 'inset(100% 0% 0% 0%)'
-        },
-        {
-            y: 0,
-            clipPath: 'inset(0% 0% 0% 0%)',
-            stagger: 0.1,
-            duration: 0.5,
-            ease: 'power2.out',
-            overwrite: 'auto'
-        }
-    );
-}
 
 function showCategoryDetails(category) {
     lastIndex = 0;
@@ -102,11 +81,6 @@ function showCategoryDetails(category) {
         detailList.appendChild(itemDiv);
     });
 
-    if (typeof gsap !== 'undefined') {
-        const allTexts = detailList.querySelectorAll('.Price, .Ingredient');
-        gsap.set(allTexts, { clipPath: 'inset(0% 0% 100% 0%)', y: 30 });
-    }
-
     detailList.scrollTop = 0;
     lastScrollTop = 0;
 
@@ -114,20 +88,9 @@ function showCategoryDetails(category) {
         backgroundTint.style.backgroundColor = items[0].tint;
     }
 
-    if (category === "Macarons") {
-        createFloatingBG(true, items[0].bgImages);
-    } else {
-        floatingBarContainer.innerHTML = '';
-    }
+    floatingBarContainer.innerHTML = '';
 
     detailView.classList.add('active');
-
-    setTimeout(() => {
-        const firstItem = document.querySelector('.Detail-Item');
-        if (firstItem) {
-            animTextInItem(firstItem, 'down');
-        }
-    }, 400);
 }
 
 detailList.addEventListener('scroll', () => {
@@ -144,72 +107,6 @@ detailList.addEventListener('scroll', () => {
 
     if (index !== lastIndex) {
         lastIndex = index;
-
-        if (currentCategory === "Macarons") {
-            const currentItem = currentCategoryItems[index];
-            updateFloatingBG(currentItem ? currentItem.bgImages : []);
-        }
-
-        const items = document.querySelectorAll('.Detail-Item');
-        const nextItem = items[index];
-        if (nextItem) {
-            animTextInItem(nextItem, dir);
-        }
     }
 });
 
-function createFloatingBG(shouldClear = false, images = []) {
-    if (shouldClear) floatingBarContainer.innerHTML = '';
-    if (!images || images.length === 0) return;
-
-    const itemCount = 8;
-    for (let i = 0; i < itemCount; i++) {
-        const item = document.createElement('div');
-        item.className = 'Floating-Item';
-
-        // Pick a random image from the provided set
-        const randomImg = images[Math.floor(Math.random() * images.length)];
-        item.style.backgroundImage = `url('${randomImg}')`;
-
-        item.style.left = `${Math.random() * 85}%`;
-        item.style.top = `${Math.random() * 80 + 10}%`;
-
-        const rotate = Math.random() * 360;
-        const scale = 0.6 + Math.random() * 0.8;
-        const speed = 1.2 + Math.random() * 1.3;
-
-        item.dataset.rotate = rotate;
-        item.dataset.scale = scale;
-        item.dataset.speed = speed;
-
-        item.style.transform = `translateY(110vh) rotate(${rotate}deg) scale(${scale})`;
-        item.style.transition = `transform ${speed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
-
-        floatingBarContainer.appendChild(item);
-
-        setTimeout(() => {
-            item.style.transform = `translateY(0vh) rotate(${rotate}deg) scale(${scale})`;
-        }, 50);
-    }
-}
-
-function updateFloatingBG(newImages = []) {
-    const oldItems = document.querySelectorAll('.Floating-Item:not(.Exiting)');
-
-    oldItems.forEach((item, i) => {
-        item.classList.add('Exiting');
-
-        const rotate = item.dataset.rotate || '0';
-        const scale = item.dataset.scale || '1';
-        const speed = item.dataset.speed || '1.5';
-
-        item.style.transition = `transform ${speed}s cubic-bezier(0.2, 0.8, 0.2, 1)`;
-        item.style.transform = `translateY(-110vh) rotate(${rotate}deg) scale(${scale})`;
-
-        setTimeout(() => {
-            if (item.parentNode) item.remove();
-        }, 3000);
-    });
-
-    createFloatingBG(false, newImages);
-}
