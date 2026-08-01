@@ -4,31 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menus</title>
-    <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            gap: 20px;
-        }
-        a {
-            font-size: 20px;
-            text-decoration: none;
-            color: #333;
-        }
-    .disabled-link {
-      pointer-events: none;
-      cursor: default;
-      opacity: 0.6;
-}
-</style>
-    </style>
+    <link rel="stylesheet" href="main-style.css">
 </head>
 <body>
-    <a href="./Cookies.html">Basic Menu</a>
-    <a href="./pizza.html">Standard Menu</a>
-    <a href="./Plus" class="disabled-link">Plus Menu</a>
+    <div class="menus-preview">
+        <a href="./Cookies.html">Basic Menu</a>
+        <a href="./pizza.html">Standard Menu</a>
+        <a href="./Plus" class="disabled-link">Plus Menu</a>
+    </div>
+
+    <div class="menus" class="section">
+        <div class="main-type">
+            <p>The Menu</p> 
+            <p>An advanced scroll-through Menu experience with name,price...etc of all the dishes,with built in ordering system. </p>
+        </div>
+        <div class="other-types">
+        <div class="basic-menu">
+            <p class="menu-title">Basic</p>
+            <p class="menu-text">35 000 DA</p>
+            <p class="menu-text">A simple menu design with plain text and images.</p>
+        </div>
+        <div class="standard-menu">
+            <p class="menu-title">Standard</p>
+            <p class="menu-text">75 000 DA</p>
+            <p class="menu-text">Animated & interactive menu with custom design and effects.</p>
+        </div>
+        <div class="plus-menu">
+            <p class="menu-title">Plus</p>
+            <p class="menu-text">135 000 DA</p>
+            <p class="menu-text">For a experience based restaurant , a fully customized Menu that expands the customer's experience.</p>
+        </div>
+        </div>
+    </div>
+    <div class="dashBoard" class="section">
+        <div class="main-type">
+            <p>DashBoard</p>
+            <p>Resive and manage customer orders in real time.</p>
+        </div>
+        <div class="other-types">
+            <div class="dashBoard-basic">
+                <p class="menu-title">Basic</p>
+                <p class="menu-text">None</p>
+                <p class="menu-text">A simple web interface.</p>
+            </div>
+            <div class="dashBoard-standard">
+                <p class="menu-title">Standard</p>
+                <p class="menu-text">15 000 DA</p>
+                <p class="menu-text">A Complete DashBoard Custom Application with Sales,Orders...etc statistics and more features. </p>
+            </div>
+        </div>
+    </div>
+    <div class="qr-code" class="section">
+        <div class="main-type">
+            <p>QR Code</p>
+            <p>A custom QR Code on each table to access the menu and place orders directly.</p>
+        </div>
+        <div class="other-types">
+            <div class="qr-code-basic">
+                <p class="menu-title">Basic</p>
+                <p class="menu-text">800 DA</p>
+                <p class="menu-text">A simple QR Code aluminum sticker.</p>
+            </div> 
+            <div class="qr-code-standard">
+                <p class="menu-title">Standard</p>
+                <p class="menu-text">-</p>
+                <p class="menu-text">A custom QR Code stand that can be made of any material and any design.</p>
+            </div>
+        </div>
+    </div>
+    <div class="hardware" class="section">
+        <div class="main-type">
+            <p>Hardware</p>
+            <p>Hardware for local connections for those who don't have internet and to ditch server rental costs ,dashboard screen.</p>
+        </div>
+        <div class="other-types">
+            <div class="hardware-basic">
+                <p class="menu-title">None needed</p>
+                <p class="menu-text">None</p>
+                <p class="menu-text">server rental and internet connection needed for all customers.</p>
+            </div> 
+            <div class="hardware-standard">
+                <p class="menu-title">Server + Router</p>
+                <p class="menu-text">30 000-50 000 DA</p>
+                <p class="menu-text">A local server and router for local connections and dashboard screen.</p>
+            </div>
+            <div class="hardware-plus">
+                <p class="menu-title">Screen</p>
+                <p class="menu-text">15 000-25 000 DA</p>
+                <p class="menu-text">A touch screen for the admin dashboard.</p>
+            </div>
+        </div>
+    </div>
+    <div class="contact">
+        <p>The Menu</p>
+        <p>+213 555 555 555</p>
+    </div>
 </body>
 </html>
