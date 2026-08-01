@@ -1,3 +1,22 @@
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.menus-preview,
+.menus,
+.dashBoard,
+.qr-code,
+.hardware,
+.contact {
+    scroll-snap-align: start;
+}
+
 .menus-preview {
     display: flex;
     flex-direction: column;
@@ -7,7 +26,8 @@
     gap: 20px;
 }
 
-a,p {
+a,
+p {
     font-size: 20px;
     text-decoration: none;
     color: #333;
@@ -33,12 +53,15 @@ a,p {
 .menu-title {
     line-height: 1;
 }
+
 .menu-text {
     line-height: 0.5;
 }
 
 /* DashBoard */
-.dashBoard , .qr-code , .hardware{
+.dashBoard,
+.qr-code,
+.hardware {
     height: 100vh;
     width: 100%;
     display: flex;
@@ -47,6 +70,7 @@ a,p {
     align-items: center;
     gap: 40px;
 }
+
 .other-types {
     display: flex;
     flex-direction: column;
@@ -61,4 +85,28 @@ a,p {
     justify-content: center;
     align-items: center;
     height: 100vh;
+}
+
+@media (max-width: 768px) {
+
+    p,
+    a,
+    .menu-title,
+    .menu-text,
+    .main-type,
+    .other-types div {
+        text-align: center;
+        line-height: normal !important;
+    }
+
+    .menus-preview,
+    .menus,
+    .dashBoard,
+    .qr-code,
+    .hardware,
+    .contact,
+    .other-types {
+        align-items: center;
+        text-align: center;
+    }
 }
