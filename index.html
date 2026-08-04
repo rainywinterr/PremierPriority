@@ -1,103 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menus</title>
     <link rel="stylesheet" href="main-style.css">
 </head>
+
 <body>
-    <div class="menus-preview">
-        <a href="./Cookies.html">Basic Menu</a>
-        <a href="./pizza.html">Standard Menu</a>
-        <a href="./Plus" class="disabled-link">Plus Menu</a>
+    <div class="lang-selector">
+        <button onclick="changeLanguage('fr')" id="btn-fr" class="active">fr</button>
+        <button onclick="changeLanguage('en')" id="btn-en">en</button>
     </div>
 
-    <div class="menus" class="section">
+    <div class="menus-preview">
+        <a href="./Cookies.html" data-i18n="basicMenu">Menu de Base</a>
+        <a href="./pizza.html" data-i18n="stdMenu">Menu Standard</a>
+        <a href="./Plus" class="disabled-link" data-i18n="plusMenu">Menu Plus</a>
+    </div>
+
+    <div class="menus section">
         <div class="main-type">
-            <p>The Menu</p> 
-            <p>An advanced scroll-through Menu experience with name,price...etc of all the dishes,with built in ordering system. </p>
+            <p data-i18n="theMenu">Le Menu</p>
+            <p data-i18n="menuDesc">Une expérience de menu avancée à défilement avec nom, prix, etc. de tous les plats,
+                avec système de commande intégré.</p>
         </div>
         <div class="other-types">
-        <div class="basic-menu">
-            <p class="menu-title">Basic</p>
-            <p class="menu-text">35 000 DA</p>
-            <p class="menu-text">A simple menu design with plain text and images.</p>
-        </div>
-        <div class="standard-menu">
-            <p class="menu-title">Standard</p>
-            <p class="menu-text">75 000 DA</p>
-            <p class="menu-text">Animated & interactive menu with custom design and effects.</p>
-        </div>
-        <div class="plus-menu">
-            <p class="menu-title">Plus</p>
-            <p class="menu-text">135 000 DA</p>
-            <p class="menu-text">For a experience based restaurant , a fully customized Menu that expands the customer's experience.</p>
-        </div>
+            <div class="basic-menu">
+                <p class="menu-title" data-i18n="basic">Basique</p>
+                <p class="menu-text">35 000 DA</p>
+                <p class="menu-text" data-i18n="basicDesc">Un design de menu simple avec du texte brut et des images.
+                </p>
+            </div>
+            <div class="standard-menu">
+                <p class="menu-title" data-i18n="std">Standard</p>
+                <p class="menu-text">75 000 DA</p>
+                <p class="menu-text" data-i18n="stdDesc">Menu animé et interactif avec design et effets personnalisés.
+                </p>
+            </div>
+            <div class="plus-menu">
+                <p class="menu-title" data-i18n="plus">Plus</p>
+                <p class="menu-text">135 000 DA</p>
+                <p class="menu-text" data-i18n="plusDesc">Pour un restaurant basé sur l'expérience, un menu entièrement
+                    personnalisé qui enrichit l'expérience du client.</p>
+            </div>
         </div>
     </div>
-    <div class="dashBoard" class="section">
+    <div class="dashBoard section">
         <div class="main-type">
-            <p>DashBoard</p>
-            <p>Resive and manage customer orders in real time.</p>
+            <p data-i18n="dash">Tableau de Bord</p>
+            <p data-i18n="dashDesc">Recevez et gérez les commandes des clients en temps réel.</p>
         </div>
         <div class="other-types">
             <div class="dashBoard-basic">
-                <p class="menu-title">Basic</p>
-                <p class="menu-text">None</p>
-                <p class="menu-text">A simple web interface.</p>
+                <p class="menu-title" data-i18n="basic">Basique</p>
+                <p class="menu-text" data-i18n="none">Aucun</p>
+                <p class="menu-text" data-i18n="dashBasicDesc">Une interface web simple.</p>
             </div>
             <div class="dashBoard-standard">
-                <p class="menu-title">Standard</p>
+                <p class="menu-title" data-i18n="std">Standard</p>
                 <p class="menu-text">15 000 DA</p>
-                <p class="menu-text">A Complete DashBoard Custom Application with Sales,Orders...etc statistics and more features. </p>
+                <p class="menu-text" data-i18n="dashStdDesc">Une application personnalisée complète de tableau de bord
+                    avec des statistiques sur les ventes, les commandes, etc., et plus de fonctionnalités.</p>
             </div>
         </div>
     </div>
-    <div class="qr-code" class="section">
+    <div class="qr-code section">
         <div class="main-type">
-            <p>QR Code</p>
-            <p>A custom QR Code on each table to access the menu and place orders directly.</p>
+            <p data-i18n="qr">Code QR</p>
+            <p data-i18n="qrDesc">Un code QR personnalisé sur chaque table pour accéder au menu et passer commande
+                directement.</p>
         </div>
         <div class="other-types">
             <div class="qr-code-basic">
-                <p class="menu-title">Basic</p>
+                <p class="menu-title" data-i18n="basic">Basique</p>
                 <p class="menu-text">800 DA</p>
-                <p class="menu-text">A simple QR Code aluminum sticker.</p>
-            </div> 
+                <p class="menu-text" data-i18n="qrBasicDesc">Un simple autocollant en aluminium avec code QR.</p>
+            </div>
             <div class="qr-code-standard">
-                <p class="menu-title">Standard</p>
+                <p class="menu-title" data-i18n="std">Standard</p>
                 <p class="menu-text">-</p>
-                <p class="menu-text">A custom QR Code stand that can be made of any material and any design.</p>
+                <p class="menu-text" data-i18n="qrStdDesc">Un support de code QR personnalisé qui peut être fabriqué
+                    dans n'importe quel matériau et design.</p>
             </div>
         </div>
     </div>
-    <div class="hardware" class="section">
+    <div class="hardware section">
         <div class="main-type">
-            <p>Hardware</p>
-            <p>Hardware for local connections for those who don't have internet and to ditch server rental costs ,dashboard screen.</p>
+            <p data-i18n="hw">Matériel</p>
+            <p data-i18n="hwDesc">Matériel pour connexions locales pour ceux qui n'ont pas internet et pour éviter les
+                coûts de location de serveur, écran de tableau de bord.</p>
         </div>
         <div class="other-types">
             <div class="hardware-basic">
-                <p class="menu-title">None needed</p>
-                <p class="menu-text">None</p>
-                <p class="menu-text">server rental and internet connection needed for all customers.</p>
-            </div> 
+                <p class="menu-title" data-i18n="hwNone">Aucun requis</p>
+                <p class="menu-text" data-i18n="none">Aucun</p>
+                <p class="menu-text" data-i18n="hwBasicDesc">Location de serveur et connexion internet requises pour
+                    tous les clients.</p>
+            </div>
             <div class="hardware-standard">
-                <p class="menu-title">Server + Router</p>
+                <p class="menu-title" data-i18n="hwServer">Serveur + Routeur</p>
                 <p class="menu-text">30 000-50 000 DA</p>
-                <p class="menu-text">A local server and router for local connections and dashboard screen.</p>
+                <p class="menu-text" data-i18n="hwStdDesc">Un serveur local et un routeur pour les connexions locales et
+                    l'écran du tableau de bord.</p>
             </div>
             <div class="hardware-plus">
-                <p class="menu-title">Screen</p>
-                <p class="menu-text">15 000-25 000 DA</p>
-                <p class="menu-text">A touch screen for the admin dashboard.</p>
+                <p class="menu-title" data-i18n="hwScreen">Écran</p>
+                <p class="menu-text">35 000 DA</p>
+                <p class="menu-text" data-i18n="hwPlusDesc">Un écran tactile pour le tableau de bord d'administration.
+                </p>
             </div>
         </div>
     </div>
     <div class="contact">
-        <p>The Menu</p>
-        <p>+213 555 555 555</p>
+        <p data-i18n="theMenu">Le Menu</p>
+        <p>05 52 65 69 39</p>
     </div>
+
+    <script>
+        const translations = {
+            fr: {
+                basicMenu: "Menu de Base", stdMenu: "Menu Standard", plusMenu: "Menu Plus",
+                theMenu: "Le Menu", menuDesc: "Une expérience de menu avancée à défilement avec nom, prix, etc. de tous les plats, avec système de commande intégré.",
+                basic: "Basique", std: "Standard", plus: "Plus", none: "Aucun",
+                basicDesc: "Un design de menu simple avec du texte brut et des images.",
+                stdDesc: "Menu animé et interactif avec design et effets personnalisés.",
+                plusDesc: "Pour un restaurant basé sur l'expérience, un menu entièrement personnalisé qui enrichit l'expérience du client.",
+                dash: "Tableau de Bord", dashDesc: "Recevez et gérez les commandes des clients en temps réel.",
+                dashBasicDesc: "Une interface web simple.",
+                dashStdDesc: "Une application personnalisée complète de tableau de bord avec des statistiques sur les ventes, les commandes, etc., et plus de fonctionnalités.",
+                qr: "Code QR", qrDesc: "Un code QR personnalisé sur chaque table pour accéder au menu et passer commande directement.",
+                qrBasicDesc: "Un simple autocollant en aluminium avec code QR.",
+                qrStdDesc: "Un support de code QR personnalisé qui peut être fabriqué dans n'importe quel matériau et design.",
+                hw: "Matériel", hwDesc: "Matériel pour connexions locales pour ceux qui n'ont pas internet et pour éviter les coûts de location de serveur, écran de tableau de bord.",
+                hwNone: "Aucun requis", hwBasicDesc: "Location de serveur et connexion internet requises pour tous les clients.",
+                hwServer: "Serveur + Routeur", hwStdDesc: "Un serveur local et un routeur pour les connexions locales et l'écran du tableau de bord.",
+                hwScreen: "Écran", hwPlusDesc: "Un écran tactile pour le tableau de bord d'administration."
+            },
+            en: {
+                basicMenu: "Basic Menu", stdMenu: "Standard Menu", plusMenu: "Plus Menu",
+                theMenu: "The Menu", menuDesc: "An advanced scroll-through Menu experience with name,price...etc of all the dishes,with built in ordering system.",
+                basic: "Basic", std: "Standard", plus: "Plus", none: "None",
+                basicDesc: "A simple menu design with plain text and images.",
+                stdDesc: "Animated & interactive menu with custom design and effects.",
+                plusDesc: "For a experience based restaurant , a fully customized Menu that expands the customer's experience.",
+                dash: "DashBoard", dashDesc: "Resive and manage customer orders in real time.",
+                dashBasicDesc: "A simple web interface.",
+                dashStdDesc: "A Complete DashBoard Custom Application with Sales,Orders...etc statistics and more features.",
+                qr: "QR Code", qrDesc: "A custom QR Code on each table to access the menu and place orders directly.",
+                qrBasicDesc: "A simple QR Code aluminum sticker.",
+                qrStdDesc: "A custom QR Code stand that can be made of any material and any design.",
+                hw: "Hardware", hwDesc: "Hardware for local connections for those who don't have internet and to ditch server rental costs ,dashboard screen.",
+                hwNone: "None needed", hwBasicDesc: "server rental and internet connection needed for all customers.",
+                hwServer: "Server + Router", hwStdDesc: "A local server and router for local connections and dashboard screen.",
+                hwScreen: "Screen", hwPlusDesc: "A touch screen for the admin dashboard."
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.lang-selector button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+        }
+    </script>
 </body>
+
 </html>

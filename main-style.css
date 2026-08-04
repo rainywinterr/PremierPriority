@@ -49,6 +49,9 @@ p {
     gap: 40px;
 }
 
+.section {
+    margin: 0 auto;
+}
 
 .menu-title {
     line-height: 1;
@@ -97,6 +100,8 @@ p {
     .other-types div {
         text-align: center;
         line-height: normal !important;
+        font-size: 15px;
+        font-family: Arial, Helvetica, sans-serif;
     }
 
     .menus-preview,
@@ -109,4 +114,33 @@ p {
         align-items: center;
         text-align: center;
     }
+
+    .menus,
+    .dashBoard,
+    .qr-code,
+    .hardware {
+        width: 95vw;
+    }
+
+}
+
+.lang-selector {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+}
+
+.lang-selector button {
+    padding: 5px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    color: #666;
+}
+
+.lang-selector button.active {
+    color: #000;
 }
