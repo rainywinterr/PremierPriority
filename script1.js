@@ -58,10 +58,12 @@ function showCategoryDetails(category) {
     lastIndex = 0;
     const items = menuData[category] || [];
     detailList.innerHTML = '';
+    detailView.dataset.category = category;
 
     items.forEach(data => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'Detail-Item';
+        itemDiv.dataset.category = category;
         itemDiv.innerHTML = `
             <div class="Detail-Content">
                 <div class="Header-Section">
