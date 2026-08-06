@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Menu Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bebas+Neue&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <!-- Mobile sidebar backdrop -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🍪</span>
+            <span class="logo-text">MenuAdmin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <p class="nav-label">Categories</p>
+            <ul id="category-tabs">
+                <!-- filled by JS -->
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <button id="export-btn" class="export-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Export JSON
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="topbar">
+            <button class="menu-toggle" id="menu-toggle" aria-label="Open menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+            </button>
+            <div class="topbar-left">
+                <h1 id="current-category-title">Cookies</h1>
+                <span class="item-count" id="item-count">0 items</span>
+            </div>
+            <div class="topbar-right">
+                <button id="add-btn" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                    Add Item
+                </button>
+            </div>
+        </header>
+
+        <!-- Drag-and-drop list -->
+        <section class="items-panel">
+            <p class="drag-hint">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="7" r="1" />
+                    <circle cx="9" cy="12" r="1" />
+                    <circle cx="9" cy="17" r="1" />
+                    <circle cx="15" cy="7" r="1" />
+                    <circle cx="15" cy="12" r="1" />
+                    <circle cx="15" cy="17" r="1" />
+                </svg>
+                Drag rows to reorder
+            </p>
+            <ul id="items-list" class="items-list">
+                <!-- cards filled by JS -->
+            </ul>
+        </section>
+    </main>
+
+    <!-- Edit / Add Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">Edit Item</h2>
+                <button id="modal-close" class="modal-close" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Image upload -->
+                <div class="field-group image-field">
+                    <label>Image</label>
+                    <div class="image-upload-area" id="image-upload-area">
+                        <img id="preview-img" src="" alt="preview" class="hidden">
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <polyline points="21 15 16 10 5 21" />
+                            </svg>
+                            <span>Click or drag image here</span>
+                        </div>
+                        <input type="file" id="image-input" accept="image/*" class="hidden-input">
+                    </div>
+                    <div class="path-field-wrap">
+                        <input type="text" id="image-path" class="field-input"
+                            placeholder="Or type image path, e.g. ./VanillaCookie.png">
+                    </div>
+                </div>
+
+                <!-- Name -->
+                <div class="field-group">
+                    <label for="item-name">Name</label>
+                    <input type="text" id="item-name" class="field-input" placeholder="e.g. Choco Chip">
+                </div>
+
+                <!-- Price -->
+                <div class="field-group">
+                    <label for="item-price">Price</label>
+                    <input type="text" id="item-price" class="field-input" placeholder="e.g. 350 DZD">
+                </div>
+
+                <!-- Description / Ingredients -->
+                <div class="field-group">
+                    <label for="item-desc">Description / Ingredients <span
+                            class="label-hint">(comma-separated)</span></label>
+                    <textarea id="item-desc" class="field-input" rows="3"
+                        placeholder="Flour, Butter, Chocolate Chips, Sugar"></textarea>
+                </div>
+
+                <!-- Calories -->
+                <div class="field-group">
+                    <label for="item-calories">Calories</label>
+                    <input type="text" id="item-calories" class="field-input" placeholder="e.g. 250 kcal">
+                </div>
+
+                <!-- Color -->
+                <div class="field-group color-row">
+                    <div>
+                        <label for="item-color">Accent Color</label>
+                        <div class="color-wrap">
+                            <input type="color" id="item-color" value="#6F4E37">
+                            <span id="color-hex">#6F4E37</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="item-tint">Background Tint</label>
+                        <div class="color-wrap">
+                            <input type="color" id="item-tint" value="#FFFaf0">
+                            <span id="tint-hex">#FFFaf0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="field-group">
+                    <label for="item-category">Category</label>
+                    <select id="item-category" class="field-input">
+                        <!-- filled by JS -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="modal-cancel" class="btn-ghost">Cancel</button>
+                <button id="modal-delete" class="btn-danger hidden">Delete Item</button>
+                <button id="modal-save" class="btn-primary">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
