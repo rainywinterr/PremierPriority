@@ -68,19 +68,15 @@ const toast = document.getElementById('toast');
 // BUILD UI
 // ═══════════════════════════════════════════════════════
 
-// Category dot colours (one per category in order)
-const CAT_COLORS = ["#D4A373", "#B5CFB7", "#C9B1FF", "#FFB3C6"];
-
 function buildCategoryTabs() {
     categoryTabsEl.innerHTML = '';
     const cats = Object.keys(menuData);
-    cats.forEach((cat, i) => {
+    cats.forEach(cat => {
         const li = document.createElement('li');
         if (cat === activeCategory) li.classList.add('active');
         const btn = document.createElement('button');
         const dot = document.createElement('span');
         dot.className = 'cat-dot';
-        dot.style.background = CAT_COLORS[i % CAT_COLORS.length];
         btn.appendChild(dot);
         btn.appendChild(document.createTextNode(cat));
         btn.addEventListener('click', () => switchCategory(cat));
