@@ -5,7 +5,7 @@ const menuData = {
         { name: "Double Dark", price: "400 DZD", ingredients: ["Cocoa", "Dark Chocolate", "Sea Salt"], calories: "280 kcal", img: "./ChocoCookie.png", color: "#3C2A21", tint: "#f2efe4" }
     ],
     "Ice Cream": [
-        { name: "Vanilla Bean", price: "450 DZD", ingredients: ["Cream", "Milk", "Madagascar Vanilla"], calories: "300 kcal", img: "./VanillaScoop.png", color: "#F3E5AB", tint: "#FFFDE7" },
+        { name: "Vanilla Bean", price: "450 DZD", ingredients: ["Cream", "Milk", "Madagascar Vanilla"], calories: "300 kcal", img: "./VanillaScoop.avif", color: "#F3E5AB", tint: "#FFFDE7" },
         { name: "Belgian Choco", price: "500 DZD", ingredients: ["Belgian Cocoa", "Fresh Cream"], calories: "350 kcal", img: "./ChocoScoop.png", color: "#4B3621", tint: "#EFEBE9" }
     ],
     "Drinks": [
