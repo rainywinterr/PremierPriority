@@ -1,20 +1,20 @@
 const menuData = {
     "Cookies": [
-        { name: "Choco Chip", price: "350 DZD", ingredients: ["Flour", "Butter", "Chocolate Chips", "Sugar"], calories: "250 kcal", img: "./VanillaCookie.png", color: "#6F4E37", tint: "#FFFaf0" },
-        { name: "Oatmeal Raisin", price: "300 DZD", ingredients: ["Oats", "Raisins", "Cinnamon", "Brown Sugar"], calories: "220 kcal", img: "./FrezCookie.png", color: "#D2691E", tint: "#FFF5EE" },
-        { name: "Double Dark", price: "400 DZD", ingredients: ["Cocoa", "Dark Chocolate", "Sea Salt"], calories: "280 kcal", img: "./ChocoCookie.png", color: "#3C2A21", tint: "#f2efe4" }
+        { name: "Pépites de Chocolat", price: "350 DZD", ingredients: ["Farine", "Beurre", "Pépites de Chocolat", "Sucre"], calories: "250 kcal", img: "./VanillaCookie.png", color: "#6F4E37", tint: "#FFFaf0" },
+        { name: "Avoine & Raisins", price: "300 DZD", ingredients: ["Flocons d'Avoine", "Raisins Secs", "Cannelle", "Sucre Roux"], calories: "220 kcal", img: "./FrezCookie.png", color: "#D2691E", tint: "#FFF5EE" },
+        { name: "Double Chocolat Noir", price: "400 DZD", ingredients: ["Cacao", "Chocolat Noir", "Fleur de Sel"], calories: "280 kcal", img: "./ChocoCookie.png", color: "#3C2A21", tint: "#f2efe4" }
     ],
-    "Ice Cream": [
-        { name: "Vanilla Bean", price: "450 DZD", ingredients: ["Cream", "Milk", "Madagascar Vanilla"], calories: "300 kcal", img: "./VanillaScoop.avif", color: "#F3E5AB", tint: "#FFFDE7" },
-        { name: "Belgian Choco", price: "500 DZD", ingredients: ["Belgian Cocoa", "Fresh Cream"], calories: "350 kcal", img: "./ChocoScoop.png", color: "#4B3621", tint: "#EFEBE9" }
+    "Glaces": [
+        { name: "Gousse de Vanille", price: "450 DZD", ingredients: ["Crème", "Lait", "Vanille de Madagascar"], calories: "300 kcal", img: "./VanillaScoop.png", color: "#F3E5AB", tint: "#FFFDE7" },
+        { name: "Chocolat Belge", price: "500 DZD", ingredients: ["Cacao Belge", "Crème Fraîche"], calories: "350 kcal", img: "./ChocoScoop.png", color: "#4B3621", tint: "#EFEBE9" }
     ],
-    "Drinks": [
-        { name: "Iced Latte", price: "400 DZD", ingredients: ["Espresso", "Milk", "Ice"], calories: "150 kcal", img: "./drinkslatte.png", color: "#C0A080", tint: "#EFEBE9" },
-        { name: "Berry Smoothie", price: "550 DZD", ingredients: ["Mixed Berries", "Yogurt", "Honey"], calories: "210 kcal", img: "./drinksfrez.png", color: "#904D77", tint: "#F3E5F5" }
+    "Boissons": [
+        { name: "Latte Glacé", price: "400 DZD", ingredients: ["Espresso", "Lait", "Glaçons"], calories: "150 kcal", img: "./drinkslatte.png", color: "#C0A080", tint: "#EFEBE9" },
+        { name: "Smoothie aux Fruits Rouges", price: "550 DZD", ingredients: ["Mélange de Fruits Rouges", "Yaourt", "Miel"], calories: "210 kcal", img: "./drinksfrez.png", color: "#904D77", tint: "#F3E5F5" }
     ],
     "Macarons": [
-        { name: "Pistachio", price: "250 DZD", ingredients: ["Almond Flour", "Pistachio Paste"], calories: "80 kcal", img: "./macaronpistach.png", color: "#93C572", tint: "#F1F8E9", bgImages: ["./BGpistach1.png", "./BGpistach2.png"] },
-        { name: "Raspberry", price: "250 DZD", ingredients: ["Raspberry Jam", "Egg Whites"], calories: "85 kcal", img: "./macaronfrez.png", color: "#E30B5C", tint: "#FCE4EC", bgImages: ["./BGfrez1.png", "./BGfrez2.png", "./BGfrez3.png"] }
+        { name: "Pistache", price: "250 DZD", ingredients: ["Poudre d'Amande", "Pâte de Pistache"], calories: "80 kcal", img: "./macaronpistach.png", color: "#93C572", tint: "#F1F8E9", bgImages: ["./BGpistach1.png", "./BGpistach2.png"] },
+        { name: "Framboise", price: "250 DZD", ingredients: ["Confiture de Framboise", "Blancs d'Œufs"], calories: "85 kcal", img: "./macaronfrez.png", color: "#E30B5C", tint: "#FCE4EC", bgImages: ["./BGfrez1.png", "./BGfrez2.png", "./BGfrez3.png"] }
     ]
 };
 

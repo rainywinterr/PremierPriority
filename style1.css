@@ -152,7 +152,7 @@ body {
     justify-content: center;
     align-items: center;
     /* Center horizontally */
-    gap: 20px;
+    gap: 50px;
 }
 
 .Category-Item {
@@ -180,7 +180,7 @@ body {
     font-size: 60px;
     font-weight: 500;
     line-height: 1;
-    color: #555;
+    color: #161616;
     letter-spacing: 4px;
 
     position: static;

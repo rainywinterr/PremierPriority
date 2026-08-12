@@ -19,6 +19,15 @@ window.addEventListener("load", () => {
 /* ── FAB Button ──────────────────────────────────── */
 const fabAdd = document.getElementById('fab-add');
 const fabPanel = document.getElementById('fab-panel');
+const fabOrder = document.getElementById('fab-order');
+const orderModal = document.getElementById('order-modal');
+const orderBadge = document.getElementById('order-count-badge');
+const orderListEl = document.getElementById('order-list');
+const orderTotalEl = document.getElementById('order-total');
+const orderSubmitBtn = document.getElementById('order-submit');
+
+// Order state
+let orderItems = [];
 
 fabAdd.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -31,6 +40,11 @@ fabAdd.addEventListener('click', (e) => {
 });
 
 function openFabPanel() {
+    // Reset pills to defaults
+    document.querySelectorAll('#size-pills .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
+    document.querySelectorAll('#crust-pills .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
+    document.querySelectorAll('#extras-pills .pill').forEach(p => p.classList.remove('active'));
+
     fabPanel.classList.remove('hidden');
     fabAdd.classList.add('open');
 }
@@ -50,7 +64,6 @@ document.addEventListener('click', (e) => {
 document.querySelectorAll('.fab-option-pills').forEach(group => {
     group.querySelectorAll('.pill').forEach(pill => {
         pill.addEventListener('click', () => {
-            // Extras group allows multi-select
             if (group.id === 'extras-pills') {
                 pill.classList.toggle('active');
             } else {
@@ -61,11 +74,23 @@ document.querySelectorAll('.fab-option-pills').forEach(group => {
     });
 });
 
-// Confirm button
+// Confirm button — add item to order
 document.getElementById('fab-confirm').addEventListener('click', () => {
+    const activeSection = document.querySelector('.flavor-section[data-name]');
+    // Use the currently visible section from activeSectionId
+    const section = activeSectionId ? document.getElementById(activeSectionId) : null;
+    const name = section ? section.getAttribute('data-name') : 'Item';
+    const price = section ? section.getAttribute('data-price') : '';
+    const category = section ? section.getAttribute('data-category') : '';
+
     const size = document.querySelector('#size-pills .pill.active')?.dataset.val || 'M';
     const crust = document.querySelector('#crust-pills .pill.active')?.dataset.val || 'Classic';
     const extras = [...document.querySelectorAll('#extras-pills .pill.active')].map(p => p.dataset.val);
+
+    const item = { id: Date.now(), name, category, price, size, crust, extras, qty: 1 };
+    orderItems.push(item);
+
+    updateOrderBadge();
 
     // Visual feedback
     const btn = document.getElementById('fab-confirm');
@@ -75,9 +100,118 @@ document.getElementById('fab-confirm').addEventListener('click', () => {
         btn.textContent = 'Add to Order';
         btn.style.background = '';
         closeFabPanel();
-    }, 1200);
+    }, 1000);
+});
 
-    console.log('Order:', { size, crust, extras });
+/* ── Order Badge & FAB Visibility ─────────────────── */
+function updateOrderBadge() {
+    const totalQty = orderItems.reduce((s, i) => s + i.qty, 0);
+    orderBadge.textContent = totalQty;
+    if (totalQty > 0) {
+        fabOrder.classList.remove('hidden');
+    } else {
+        fabOrder.classList.add('hidden');
+    }
+}
+
+/* ── Order Modal ──────────────────────────────────── */
+fabOrder.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openOrderModal();
+});
+
+document.getElementById('order-modal-close').addEventListener('click', () => {
+    closeOrderModal();
+});
+
+orderModal.addEventListener('click', (e) => {
+    if (e.target === orderModal) closeOrderModal();
+});
+
+function openOrderModal() {
+    renderOrderList();
+    orderModal.classList.remove('hidden');
+}
+
+function closeOrderModal() {
+    orderModal.classList.add('hidden');
+}
+
+function renderOrderList() {
+    if (orderItems.length === 0) {
+        orderListEl.innerHTML = '<div class="order-empty">No items yet. Browse the menu and tap +</div>';
+        orderTotalEl.textContent = 'Total: 0 DZD';
+        orderSubmitBtn.disabled = true;
+        return;
+    }
+
+    orderSubmitBtn.disabled = false;
+    orderListEl.innerHTML = orderItems.map(item => {
+        const detailParts = [item.size, item.crust];
+        if (item.extras && item.extras.length) detailParts.push(item.extras.join(', '));
+        const unitPrice = parseInt((item.price || '0').replace(/\D/g, '')) || 0;
+        const linePrice = unitPrice * item.qty;
+        return `
+        <div class="order-item-card" data-id="${item.id}">
+            <div class="order-item-info">
+                <div class="order-item-name">${item.name}</div>
+                <div class="order-item-details">${detailParts.filter(Boolean).join(' · ')}</div>
+            </div>
+            <div class="order-item-qty">
+                <button class="qty-btn qty-dec" data-id="${item.id}">−</button>
+                <span class="qty-num">${item.qty}</span>
+                <button class="qty-btn qty-inc" data-id="${item.id}">+</button>
+            </div>
+            <div class="order-item-price">${linePrice.toLocaleString('fr-DZ')} DZD</div>
+        </div>`;
+    }).join('');
+
+    // Attach qty handlers
+    orderListEl.querySelectorAll('.qty-dec').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const item = orderItems.find(i => i.id === id);
+            if (!item) return;
+            if (item.qty <= 1) {
+                orderItems = orderItems.filter(i => i.id !== id);
+            } else {
+                item.qty--;
+            }
+            updateOrderBadge();
+            renderOrderList();
+            if (orderItems.length === 0) closeOrderModal();
+        });
+    });
+    orderListEl.querySelectorAll('.qty-inc').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const item = orderItems.find(i => i.id === id);
+            if (item) { item.qty++; updateOrderBadge(); renderOrderList(); }
+        });
+    });
+
+    // Calculate total
+    const total = orderItems.reduce((sum, item) => {
+        const num = parseInt((item.price || '0').replace(/\D/g, '')) || 0;
+        return sum + num * item.qty;
+    }, 0);
+    orderTotalEl.textContent = `Total: ${total.toLocaleString('fr-DZ')} DZD`;
+}
+
+// Submit to cuisine
+orderSubmitBtn.addEventListener('click', () => {
+    if (orderItems.length === 0) return;
+    orderSubmitBtn.textContent = '✓ Sent!';
+    orderSubmitBtn.style.background = '#22c55e';
+    orderSubmitBtn.disabled = true;
+    console.log('🍽 Order sent to kitchen:', orderItems);
+    setTimeout(() => {
+        orderItems = [];
+        updateOrderBadge();
+        closeOrderModal();
+        orderSubmitBtn.textContent = 'Send to Kitchen';
+        orderSubmitBtn.style.background = '';
+    }, 1500);
 });
 
 /* ── Menu UI Update ──────────────────────────────── */
