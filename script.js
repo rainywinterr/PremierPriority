@@ -2,6 +2,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 let activeSectionId = null;
 let currentCategory = "";
+let menuData = null;
+let mainCategoriesGrouped = []; // [{ main_category: "...", sub_categories: [...] }]
+let allCategories = []; // flat array of { category, pieces, items, mainCategoryTitle, mainCatIdx }
+let currentViewMode = "scroll"; // "scroll" or "grid"
+let isAnimating = false;
+let currentGridIndex = 0;
 
 /* ── Viewport height fix ─────────────────────────── */
 function updateViewportHeight() {
@@ -11,14 +17,589 @@ function updateViewportHeight() {
 window.addEventListener('resize', updateViewportHeight);
 updateViewportHeight();
 
-window.addEventListener("load", () => {
-    ScrollTrigger.refresh();
-    initFlavorAnimations();
+/* ── Helper Slugs ─────────────────────────── */
+function slugify(text) {
+    if (!text) return '';
+    return text.toString().toLowerCase().trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-');
+}
+
+/* ── Fetch Data & Build UI ──────────────────────── */
+async function loadMenuData() {
+    try {
+        let response = await fetch('./alice-menu.json');
+        if (!response.ok) {
+            response = await fetch('./alice-menu.json');
+        }
+        menuData = await response.json();
+
+        mainCategoriesGrouped = menuData.main_categories || [];
+        allCategories = [];
+
+        mainCategoriesGrouped.forEach((mainCat, mainIdx) => {
+            (mainCat.sub_categories || []).forEach(subCat => {
+                allCategories.push({
+                    category: subCat.category,
+                    pieces: subCat.pieces,
+                    items: subCat.items || [],
+                    mainCategoryTitle: mainCat.main_category,
+                    mainCatIdx: mainIdx
+                });
+            });
+        });
+
+        renderMenu();
+        renderCategoryDropdown();
+        renderGridView();
+        setTimeout(() => {
+            ScrollTrigger.refresh();
+            initFlavorAnimations();
+        }, 100);
+    } catch (err) {
+        console.error("Failed to load menu data:", err);
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadMenuData);
+} else {
+    loadMenuData();
+}
+
+/* ── Render Scroll-Through Sections ──────────────── */
+function renderMenu() {
+    const snapContainer = document.getElementById('snap-container');
+    const bgMasksContainer = document.getElementById('bg-masks-container');
+
+    snapContainer.innerHTML = '';
+    bgMasksContainer.innerHTML = '';
+
+    const bgColors = ["#12100e", "#0e0d12", "#110a0a", "#12120e", "#0b0f12", "#0e1210", "#100e0b", "#0e0f12", "#0f120e", "#0a0f12", "#120e10"];
+    let colorIdx = 0;
+
+    allCategories.forEach((cat, catIdx) => {
+        const subTitle = cat.category;
+        const subSlug = slugify(subTitle);
+
+        // Background Mask Element
+        const maskDiv = document.createElement('div');
+        maskDiv.className = 'mask bg-category-mask global-cat-bg';
+        maskDiv.id = `bg-${subSlug}`;
+        maskDiv.style.cssText = 'position: fixed; top: 50%; left: 10%; transform: translateY(-50%); z-index: 1; pointer-events: none; display: none;';
+        maskDiv.innerHTML = `<div class="bg-category-label">${subTitle.toUpperCase()}</div>`;
+        bgMasksContainer.appendChild(maskDiv);
+
+        // Render Product Sections
+        (cat.items || []).forEach((item, itemIdx) => {
+            const section = document.createElement('section');
+            const sectionId = (itemIdx === 0) ? `category-${subSlug}` : `${subSlug}-${itemIdx + 1}`;
+            section.setAttribute('id', sectionId);
+
+            const bgColor = bgColors[colorIdx % bgColors.length];
+            colorIdx++;
+
+            const ingArray = [];
+            if (item.description) ingArray.push(item.description);
+            if (item.pieces) ingArray.push(`${item.pieces} pièces`);
+            if (cat.pieces && !item.pieces) ingArray.push(`${cat.pieces} pièces`);
+            if (item.portion) ingArray.push(item.portion);
+
+            section.className = 'snap-section flavor-section';
+            section.setAttribute('data-bg', bgColor);
+            section.setAttribute('data-category', subTitle);
+            section.setAttribute('data-category-slug', subSlug);
+            section.setAttribute('data-cat-index', catIdx);
+            section.setAttribute('data-item-index', itemIdx);
+            section.setAttribute('data-name', item.name);
+            section.setAttribute('data-price', item.price || '');
+            section.setAttribute('data-ingredients', ingArray.join(';'));
+
+            section.innerHTML = `
+                <div class="flavor-layout">
+                    <div class="mask"><div class="mobile-category"></div></div>
+                    <div class="mask"><div class="mobile-product-name"></div></div>
+                    <div class="mask"><div class="mobile-price"></div></div>
+                    <div class="flavor-visual"><img src="${item.image}" alt="${item.name}" class="floating-img"></div>
+                    <div class="mask"><div class="mobile-ingredients"></div></div>
+                </div>
+            `;
+            snapContainer.appendChild(section);
+        });
+    });
+}
+
+/* ── Render Grid View Slides ─────────────────────── */
+function renderGridView() {
+    const gridSwipeContainer = document.getElementById('grid-swipe-container');
+    if (!gridSwipeContainer) return;
+    gridSwipeContainer.innerHTML = '';
+
+    allCategories.forEach((cat, catIdx) => {
+        const subTitle = cat.category;
+        const subSlug = slugify(subTitle);
+
+        const slide = document.createElement('div');
+        slide.className = 'subcat-grid-slide';
+        slide.id = `grid-slide-${subSlug}`;
+        slide.setAttribute('data-cat-index', catIdx);
+
+        let itemsHTML = (cat.items || []).map((item, itemIdx) => {
+            const sectionId = (itemIdx === 0) ? `category-${subSlug}` : `${subSlug}-${itemIdx + 1}`;
+            return `
+                <div class="grid-item-card" data-section-id="${sectionId}" data-cat-index="${catIdx}">
+                    <img src="${item.image}" alt="${item.name}" class="grid-item-img">
+                    <div class="grid-item-name">${item.name}</div>
+                    <div class="grid-item-price">${item.price || ''}</div>
+                </div>
+            `;
+        }).join('');
+
+        slide.innerHTML = `
+            <h3 class="subcat-grid-title">${subTitle}</h3>
+            <div class="subcat-items-grid">
+                ${itemsHTML}
+            </div>
+        `;
+
+        slide.addEventListener('click', (e) => {
+            const card = e.target.closest('.grid-item-card');
+            if (!card) return;
+            e.stopPropagation();
+            const targetId = card.getAttribute('data-section-id');
+            if (targetId) {
+                switchToScrollView(targetId);
+            }
+        });
+
+        gridSwipeContainer.appendChild(slide);
+    });
+
+    gridSwipeContainer.onscroll = () => {
+        const scrollLeft = gridSwipeContainer.scrollLeft;
+        const slideWidth = gridSwipeContainer.clientWidth;
+        currentGridIndex = Math.round(scrollLeft / slideWidth);
+        if (currentViewMode === 'grid') {
+            updateNavDots();
+            updateGridArrows();
+            if (allCategories[currentGridIndex]) {
+                updateTitleDisplay(allCategories[currentGridIndex].category);
+            }
+        }
+    };
+}
+
+/* ── Render Category Dropdown (With Title & Spacing Between Main Cats) ── */
+function renderCategoryDropdown() {
+    const dropdownList = document.getElementById('category-dropdown-list');
+    if (!dropdownList) return;
+    dropdownList.innerHTML = '';
+
+    // Add Title "Catégories"
+    const headerTitle = document.createElement('div');
+    headerTitle.className = 'dropdown-header-title';
+    headerTitle.textContent = 'Catégories';
+    dropdownList.appendChild(headerTitle);
+
+    let lastMainIdx = -1;
+
+    allCategories.forEach((cat, idx) => {
+        // Add spacing before new main category group
+        if (lastMainIdx !== -1 && cat.mainCatIdx !== lastMainIdx) {
+            const groupSpacer = document.createElement('div');
+            groupSpacer.className = 'dropdown-group-spacer';
+            dropdownList.appendChild(groupSpacer);
+        }
+        lastMainIdx = cat.mainCatIdx;
+
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.setAttribute('data-cat-index', idx);
+        item.textContent = cat.category;
+        item.addEventListener('click', () => {
+            dropdownList.classList.add('hidden');
+            if (currentViewMode === 'scroll') {
+                const subSlug = slugify(cat.category);
+                const targetEl = document.getElementById(`category-${subSlug}`);
+                jumpToSection(targetEl);
+            } else {
+                const gridSwipeContainer = document.getElementById('grid-swipe-container');
+                if (gridSwipeContainer) {
+                    gridSwipeContainer.style.scrollBehavior = 'auto'; // Instant jump 
+                    gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
+                    gridSwipeContainer.style.scrollBehavior = '';
+                    currentGridIndex = idx;
+                    updateNavDots();
+                    updateGridArrows();
+                    updateTitleDisplay(cat.category);
+                }
+            }
+        });
+        dropdownList.appendChild(item);
+    });
+}
+
+/* ── Fullscreen & Welcome Overlay ─────────────────── */
+function requestFullScreen() {
+    const docEl = document.documentElement;
+    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        if (docEl.requestFullscreen) {
+            docEl.requestFullscreen().catch(() => { });
+        } else if (docEl.msRequestFullscreen) {
+            docEl.msRequestFullscreen().catch(() => { });
+        } else if (docEl.mozRequestFullScreen) {
+            docEl.mozRequestFullScreen().catch(() => { });
+        } else if (docEl.webkitRequestFullscreen) {
+            docEl.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT).catch(() => { });
+        }
+    }
+}
+
+/* ── Welcome Button → Open Menu Directly ─────────── */
+document.addEventListener('click', (e) => {
+    const enterBtn = e.target.closest('#enter-fullscreen-btn');
+    if (enterBtn) {
+        requestFullScreen();
+        const welcomeOverlay = document.getElementById('welcome-overlay');
+        if (welcomeOverlay) {
+            welcomeOverlay.classList.add('dismissed');
+        }
+        openMenuView();
+    }
 });
 
-/* ── FAB Button ──────────────────────────────────── */
-const fabAdd = document.getElementById('fab-add');
-const fabPanel = document.getElementById('fab-panel');
+/* ── Open Menu View (scroll-through, first item) ── */
+function openMenuView() {
+    if (isAnimating) return;
+    isAnimating = true;
+
+    const menuView = document.getElementById('menu-view');
+    const snapContainer = document.getElementById('snap-container');
+
+    currentViewMode = 'scroll';
+    showScrollView();
+
+    menuView.classList.remove('hidden-slide');
+
+    const firstSection = snapContainer.querySelector('.snap-section');
+    if (firstSection && snapContainer) {
+        snapContainer.style.scrollBehavior = 'auto';
+        snapContainer.scrollTop = firstSection.offsetTop;
+        snapContainer.style.scrollBehavior = '';
+
+        activeSectionId = null;
+        currentCategory = "";
+        const color = firstSection.getAttribute('data-bg');
+        updateMenuUI(color, firstSection, true);
+    }
+
+    setTimeout(() => {
+        ScrollTrigger.refresh();
+        isAnimating = false;
+    }, 600);
+}
+
+/* ── Category Dropdown Toggle ────────────────────── */
+const categoryDropdownBtn = document.getElementById('category-dropdown-btn');
+if (categoryDropdownBtn) {
+    categoryDropdownBtn.addEventListener('click', () => {
+        const dropdown = document.getElementById('category-dropdown-list');
+        if (dropdown) dropdown.classList.toggle('hidden');
+    });
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#category-dropdown-btn') && !e.target.closest('#category-dropdown-list')) {
+        const dropdown = document.getElementById('category-dropdown-list');
+        if (dropdown) dropdown.classList.add('hidden');
+    }
+});
+
+/* ── View Toggle (Scroll ↔ Grid) ─────────────────── */
+const viewToggleBtn = document.getElementById('view-toggle-btn');
+if (viewToggleBtn) {
+    viewToggleBtn.addEventListener('click', () => {
+        const dropdown = document.getElementById('category-dropdown-list');
+        if (dropdown) dropdown.classList.add('hidden');
+
+        if (currentViewMode === 'scroll') {
+            currentViewMode = 'grid';
+
+            if (activeSectionId) {
+                const sec = document.getElementById(activeSectionId);
+                if (sec) {
+                    currentGridIndex = parseInt(sec.getAttribute('data-cat-index')) || 0;
+                }
+            }
+
+            showGridView();
+
+            const gridSwipeContainer = document.getElementById('grid-swipe-container');
+            if (gridSwipeContainer) {
+                gridSwipeContainer.style.scrollBehavior = 'auto';
+                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
+                gridSwipeContainer.style.scrollBehavior = '';
+            }
+
+            if (allCategories[currentGridIndex]) {
+                updateTitleDisplay(allCategories[currentGridIndex].category);
+            }
+        } else {
+            currentViewMode = 'scroll';
+            const cat = allCategories[currentGridIndex];
+            if (cat) {
+                const subSlug = slugify(cat.category);
+                switchToScrollView(`category-${subSlug}`);
+            } else {
+                showScrollView();
+            }
+        }
+
+        updateNavDots();
+        updateViewToggleIcon();
+    });
+}
+
+function switchToScrollView(targetSectionId) {
+    currentViewMode = 'scroll';
+    showScrollView();
+    updateViewToggleIcon();
+
+    const targetEl = document.getElementById(targetSectionId);
+    if (targetEl) {
+        jumpToSection(targetEl);
+    }
+}
+
+function showScrollView() {
+    const snap = document.getElementById('snap-container');
+    const grid = document.getElementById('grid-view-container');
+    const vertNav = document.getElementById('vertical-scroll-nav');
+    const horzNav = document.getElementById('horizontal-grid-nav');
+
+    if (snap) snap.classList.remove('hidden');
+    if (grid) grid.classList.add('hidden');
+    if (vertNav) vertNav.classList.remove('hidden');
+    if (horzNav) horzNav.classList.add('hidden');
+    updateViewToggleIcon();
+}
+
+function showGridView() {
+    const snap = document.getElementById('snap-container');
+    const grid = document.getElementById('grid-view-container');
+    const vertNav = document.getElementById('vertical-scroll-nav');
+    const horzNav = document.getElementById('horizontal-grid-nav');
+
+    if (snap) snap.classList.add('hidden');
+    if (grid) grid.classList.remove('hidden');
+    if (vertNav) vertNav.classList.add('hidden');
+    if (horzNav) horzNav.classList.remove('hidden');
+    updateGridArrows();
+    updateViewToggleIcon();
+}
+
+function updateViewToggleIcon() {
+    const iconScroll = document.getElementById('icon-scroll');
+    const iconGrid = document.getElementById('icon-grid');
+    if (currentViewMode === 'scroll') {
+        if (iconScroll) iconScroll.classList.add('hidden-icon');
+        if (iconGrid) iconGrid.classList.remove('hidden-icon');
+    } else {
+        if (iconScroll) iconScroll.classList.remove('hidden-icon');
+        if (iconGrid) iconGrid.classList.add('hidden-icon');
+    }
+}
+
+/* ── Vertical Nav Dots (Max 5 Visible, Auto-Scroll Windowing) ── */
+function updateNavDots() {
+    const scrollNavContainer = document.getElementById('sub-nav');
+    const gridNavContainer = document.getElementById('grid-sub-nav');
+
+    let activeDotElement = null;
+
+    if (currentViewMode === 'grid') {
+        if (!gridNavContainer) return;
+        gridNavContainer.innerHTML = '';
+        allCategories.forEach((cat, idx) => {
+            const isActive = (idx === currentGridIndex);
+            const dot = document.createElement('a');
+            dot.className = `sub-nav-dot-item ${isActive ? 'active' : ''}`;
+            dot.setAttribute('title', cat.category);
+            dot.innerHTML = `<span class="sub-dot-icon"></span>`;
+
+            if (isActive) activeDotElement = dot;
+
+            dot.addEventListener('click', (e) => {
+                e.preventDefault();
+                const gridSwipeContainer = document.getElementById('grid-swipe-container');
+                if (gridSwipeContainer) {
+                    gridSwipeContainer.style.scrollBehavior = 'auto'; // Instant jump
+                    gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
+                    gridSwipeContainer.style.scrollBehavior = '';
+                }
+            });
+            gridNavContainer.appendChild(dot);
+        });
+
+        if (activeDotElement) {
+            const dotLeft = activeDotElement.offsetLeft;
+            const containerWidth = gridNavContainer.clientWidth;
+            gridNavContainer.scrollTo({
+                left: dotLeft - containerWidth / 2 + activeDotElement.clientWidth / 2,
+                behavior: 'smooth'
+            });
+        }
+    } else {
+        if (!scrollNavContainer) return;
+        scrollNavContainer.innerHTML = '';
+        const currentCatData = allCategories.find(c => c.category === currentCategory);
+        if (!currentCatData) return;
+        const subSlug = slugify(currentCategory);
+
+        currentCatData.items.forEach((item, idx) => {
+            const sectionId = (idx === 0) ? `category-${subSlug}` : `${subSlug}-${idx + 1}`;
+            const isActive = (activeSectionId === sectionId);
+            const dot = document.createElement('a');
+            dot.className = `sub-nav-dot-item ${isActive ? 'active' : ''}`;
+            dot.setAttribute('title', item.name);
+            dot.innerHTML = `<span class="sub-dot-icon"></span>`;
+
+            if (isActive) activeDotElement = dot;
+
+            dot.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetEl = document.getElementById(sectionId);
+                jumpToSection(targetEl);
+            });
+            scrollNavContainer.appendChild(dot);
+        });
+
+        if (activeDotElement) {
+            const dotTop = activeDotElement.offsetTop;
+            const containerHeight = scrollNavContainer.clientHeight;
+            scrollNavContainer.scrollTo({
+                top: dotTop - containerHeight / 2 + activeDotElement.clientHeight / 2,
+                behavior: 'smooth'
+            });
+        }
+    }
+}
+
+/* ── Title Display ───────────────────────────────── */
+function updateTitleDisplay(categoryName) {
+    const display = document.getElementById('current-subcat-display');
+    if (!display) return;
+    if (display.textContent !== categoryName) {
+        gsap.to(display, {
+            y: -12, opacity: 0, duration: 0.15, ease: 'power2.in', onComplete: () => {
+                display.textContent = categoryName;
+                gsap.fromTo(display, { y: -12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25, ease: 'power2.out' });
+            }
+        });
+    }
+}
+
+function jumpToSection(targetEl) {
+    const snapContainer = document.getElementById('snap-container');
+    if (!targetEl || !snapContainer) return;
+
+    snapContainer.style.scrollBehavior = 'auto'; // Instant jump
+    snapContainer.scrollTop = targetEl.offsetTop;
+    snapContainer.style.scrollBehavior = '';
+
+    activeSectionId = null;
+    const color = targetEl.getAttribute('data-bg');
+    updateMenuUI(color, targetEl, true);
+    setTimeout(() => ScrollTrigger.refresh(), 50);
+}
+
+/* ── Smooth Scroll to Section with GSAP / ScrollTo ── */
+function smoothScrollToSection(targetEl) {
+    const snapContainer = document.getElementById('snap-container');
+    if (!targetEl || !snapContainer) return;
+
+    const targetTop = targetEl.offsetTop;
+
+    gsap.to(snapContainer, {
+        scrollTop: targetTop,
+        duration: 0.5,
+        ease: 'power2.out',
+        onComplete: () => {
+            activeSectionId = null;
+            const color = targetEl.getAttribute('data-bg');
+            updateMenuUI(color, targetEl, true);
+        }
+    });
+}
+
+/* ── Scroll Arrow Controls ───────────────────────── */
+function updateGridArrows() {
+    const arrowLeft = document.getElementById('scroll-arrow-left');
+    const arrowRight = document.getElementById('scroll-arrow-right');
+    if (currentViewMode !== 'grid') return;
+
+    if (arrowLeft) arrowLeft.classList.toggle('disabled', currentGridIndex <= 0);
+    if (arrowRight) arrowRight.classList.toggle('disabled', currentGridIndex >= allCategories.length - 1);
+}
+
+// Arrow click handlers
+document.addEventListener('click', (e) => {
+    const snapContainer = document.getElementById('snap-container');
+    const gridSwipeContainer = document.getElementById('grid-swipe-container');
+
+    if (e.target.closest('#scroll-arrow-up')) {
+        if (currentViewMode === 'scroll' && snapContainer) {
+            const sections = Array.from(snapContainer.querySelectorAll('.snap-section'));
+            const currentIdx = sections.findIndex(s => s.id === activeSectionId);
+            if (currentIdx > 0) {
+                const prev = sections[currentIdx - 1];
+                smoothScrollToSection(prev);
+            }
+        } else if (currentViewMode === 'grid' && gridSwipeContainer) {
+            if (currentGridIndex > 0) {
+                currentGridIndex--;
+                gridSwipeContainer.style.scrollBehavior = 'smooth';
+                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
+            }
+        }
+    }
+
+    if (e.target.closest('#scroll-arrow-down')) {
+        if (currentViewMode === 'scroll' && snapContainer) {
+            const sections = Array.from(snapContainer.querySelectorAll('.snap-section'));
+            const currentIdx = sections.findIndex(s => s.id === activeSectionId);
+            if (currentIdx < sections.length - 1) {
+                const next = sections[currentIdx + 1];
+                smoothScrollToSection(next);
+            }
+        } else if (currentViewMode === 'grid' && gridSwipeContainer) {
+            if (currentGridIndex < allCategories.length - 1) {
+                currentGridIndex++;
+                gridSwipeContainer.style.scrollBehavior = 'smooth';
+                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
+            }
+        }
+    }
+
+    if (e.target.closest('#scroll-arrow-left') && gridSwipeContainer) {
+        if (currentGridIndex > 0) {
+            currentGridIndex--;
+            gridSwipeContainer.style.scrollBehavior = 'smooth';
+            gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
+        }
+    }
+
+    if (e.target.closest('#scroll-arrow-right') && gridSwipeContainer) {
+        if (currentGridIndex < allCategories.length - 1) {
+            currentGridIndex++;
+            gridSwipeContainer.style.scrollBehavior = 'smooth';
+            gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
+        }
+    }
+});
+
+/* ── Order System & Double Click Add ─────────────── */
 const fabOrder = document.getElementById('fab-order');
 const orderModal = document.getElementById('order-modal');
 const orderBadge = document.getElementById('order-count-badge');
@@ -26,107 +607,122 @@ const orderListEl = document.getElementById('order-list');
 const orderTotalEl = document.getElementById('order-total');
 const orderSubmitBtn = document.getElementById('order-submit');
 
-// Order state
 let orderItems = [];
 
-fabAdd.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !fabPanel.classList.contains('hidden');
-    if (isOpen) {
-        closeFabPanel();
+function addToOrder(section) {
+    if (!section) section = activeSectionId ? document.getElementById(activeSectionId) : null;
+    if (!section) return;
+
+    const name = section.getAttribute('data-name') || 'Item';
+    const price = section.getAttribute('data-price') || '';
+    const category = section.getAttribute('data-category') || '';
+
+    const existing = orderItems.find(i => i.name === name && i.price === price);
+    if (existing) {
+        existing.qty++;
     } else {
-        openFabPanel();
-    }
-});
-
-function openFabPanel() {
-    // Reset pills to defaults
-    document.querySelectorAll('#size-pills .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
-    document.querySelectorAll('#crust-pills .pill').forEach((p, i) => p.classList.toggle('active', i === 0));
-    document.querySelectorAll('#extras-pills .pill').forEach(p => p.classList.remove('active'));
-
-    fabPanel.classList.remove('hidden');
-    fabAdd.classList.add('open');
-}
-
-function closeFabPanel() {
-    fabPanel.classList.add('hidden');
-    fabAdd.classList.remove('open');
-}
-
-document.addEventListener('click', (e) => {
-    if (!fabPanel.contains(e.target) && e.target !== fabAdd) {
-        closeFabPanel();
-    }
-});
-
-// Pill toggle (single-select per group)
-document.querySelectorAll('.fab-option-pills').forEach(group => {
-    group.querySelectorAll('.pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-            if (group.id === 'extras-pills') {
-                pill.classList.toggle('active');
-            } else {
-                group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-                pill.classList.add('active');
-            }
+        orderItems.push({
+            id: Date.now(),
+            name,
+            category,
+            price,
+            qty: 1
         });
-    });
-});
-
-// Confirm button — add item to order
-document.getElementById('fab-confirm').addEventListener('click', () => {
-    const activeSection = document.querySelector('.flavor-section[data-name]');
-    // Use the currently visible section from activeSectionId
-    const section = activeSectionId ? document.getElementById(activeSectionId) : null;
-    const name = section ? section.getAttribute('data-name') : 'Item';
-    const price = section ? section.getAttribute('data-price') : '';
-    const category = section ? section.getAttribute('data-category') : '';
-
-    const size = document.querySelector('#size-pills .pill.active')?.dataset.val || 'M';
-    const crust = document.querySelector('#crust-pills .pill.active')?.dataset.val || 'Classic';
-    const extras = [...document.querySelectorAll('#extras-pills .pill.active')].map(p => p.dataset.val);
-
-    const item = { id: Date.now(), name, category, price, size, crust, extras, qty: 1 };
-    orderItems.push(item);
+    }
 
     updateOrderBadge();
+    showOrderToast(name);
+    triggerBorderFlash();
+}
 
-    // Visual feedback
-    const btn = document.getElementById('fab-confirm');
-    btn.textContent = '✓ Added!';
-    btn.style.background = '#22c55e';
-    setTimeout(() => {
-        btn.textContent = 'Add to Order';
-        btn.style.background = '';
-        closeFabPanel();
-    }, 1000);
-});
+function triggerBorderFlash() {
+    let flash = document.getElementById('flash-border-overlay');
+    if (!flash) {
+        flash = document.createElement('div');
+        flash.id = 'flash-border-overlay';
+        flash.className = 'flash-border-overlay';
+        document.body.appendChild(flash);
+    }
+    gsap.killTweensOf(flash);
+    gsap.fromTo(flash,
+        { opacity: 1, boxShadow: "inset 0 0 70px 20px rgba(255, 255, 255, 0.65)", duration: 0.5 },
+        { opacity: 0, boxShadow: "inset 0 0 0px 0px rgba(255, 255, 255, 0)", duration: 3.5, ease: "power3.out" }
+    );
+}
 
-/* ── Order Badge & FAB Visibility ─────────────────── */
+function showOrderToast(itemName) {
+    let toast = document.getElementById('order-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'order-toast';
+        toast.className = 'order-toast';
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<span class="toast-icon">✓</span> <strong>${itemName}</strong>`;
+    toast.classList.add('show');
+
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2000);
+}
+
+const mainSnapContainer = document.getElementById('snap-container');
+if (mainSnapContainer) {
+    mainSnapContainer.addEventListener('dblclick', (e) => {
+        const section = e.target.closest('.snap-section');
+        if (section) {
+            addToOrder(section);
+        }
+    });
+
+    let lastTapTime = 0;
+    let lastTapSection = null;
+    mainSnapContainer.addEventListener('touchend', (e) => {
+        const section = e.target.closest('.snap-section');
+        if (!section) return;
+
+        const currentTime = Date.now();
+        const tapLength = currentTime - lastTapTime;
+
+        if (tapLength < 300 && tapLength > 0 && lastTapSection === section) {
+            e.preventDefault();
+            addToOrder(section);
+            lastTapTime = 0;
+            lastTapSection = null;
+        } else {
+            lastTapTime = currentTime;
+            lastTapSection = section;
+        }
+    });
+}
+
 function updateOrderBadge() {
     const totalQty = orderItems.reduce((s, i) => s + i.qty, 0);
-    orderBadge.textContent = totalQty;
-    if (totalQty > 0) {
-        fabOrder.classList.remove('hidden');
-    } else {
-        fabOrder.classList.add('hidden');
+    if (orderBadge) orderBadge.textContent = totalQty;
+    if (fabOrder) {
+        if (totalQty > 0) fabOrder.classList.remove('hidden');
+        else fabOrder.classList.add('hidden');
     }
 }
 
-/* ── Order Modal ──────────────────────────────────── */
-fabOrder.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openOrderModal();
-});
+if (fabOrder) {
+    fabOrder.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openOrderModal();
+    });
+}
 
-document.getElementById('order-modal-close').addEventListener('click', () => {
-    closeOrderModal();
-});
+const closeOrderModalBtn = document.getElementById('order-modal-close');
+if (closeOrderModalBtn) {
+    closeOrderModalBtn.addEventListener('click', closeOrderModal);
+}
 
-orderModal.addEventListener('click', (e) => {
-    if (e.target === orderModal) closeOrderModal();
-});
+if (orderModal) {
+    orderModal.addEventListener('click', (e) => {
+        if (e.target === orderModal) closeOrderModal();
+    });
+}
 
 function openOrderModal() {
     renderOrderList();
@@ -140,7 +736,7 @@ function closeOrderModal() {
 function renderOrderList() {
     if (orderItems.length === 0) {
         orderListEl.innerHTML = '<div class="order-empty">No items yet. Browse the menu and tap +</div>';
-        orderTotalEl.textContent = 'Total: 0 DZD';
+        orderTotalEl.textContent = 'Total: 0 DA';
         orderSubmitBtn.disabled = true;
         return;
     }
@@ -162,26 +758,23 @@ function renderOrderList() {
                 <span class="qty-num">${item.qty}</span>
                 <button class="qty-btn qty-inc" data-id="${item.id}">+</button>
             </div>
-            <div class="order-item-price">${linePrice.toLocaleString('fr-DZ')} DZD</div>
+            <div class="order-item-price">${linePrice.toLocaleString('fr-DZ')} DA</div>
         </div>`;
     }).join('');
 
-    // Attach qty handlers
     orderListEl.querySelectorAll('.qty-dec').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
             const item = orderItems.find(i => i.id === id);
             if (!item) return;
-            if (item.qty <= 1) {
-                orderItems = orderItems.filter(i => i.id !== id);
-            } else {
-                item.qty--;
-            }
+            if (item.qty <= 1) orderItems = orderItems.filter(i => i.id !== id);
+            else item.qty--;
             updateOrderBadge();
             renderOrderList();
             if (orderItems.length === 0) closeOrderModal();
         });
     });
+
     orderListEl.querySelectorAll('.qty-inc').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = parseInt(btn.dataset.id);
@@ -190,32 +783,47 @@ function renderOrderList() {
         });
     });
 
-    // Calculate total
     const total = orderItems.reduce((sum, item) => {
         const num = parseInt((item.price || '0').replace(/\D/g, '')) || 0;
         return sum + num * item.qty;
     }, 0);
-    orderTotalEl.textContent = `Total: ${total.toLocaleString('fr-DZ')} DZD`;
+    orderTotalEl.textContent = `Total: ${total.toLocaleString('fr-DZ')} DA`;
 }
 
-// Submit to cuisine
-orderSubmitBtn.addEventListener('click', () => {
-    if (orderItems.length === 0) return;
-    orderSubmitBtn.textContent = '✓ Sent!';
-    orderSubmitBtn.style.background = '#22c55e';
-    orderSubmitBtn.disabled = true;
-    console.log('🍽 Order sent to kitchen:', orderItems);
-    setTimeout(() => {
-        orderItems = [];
-        updateOrderBadge();
-        closeOrderModal();
-        orderSubmitBtn.textContent = 'Send to Kitchen';
-        orderSubmitBtn.style.background = '';
-    }, 1500);
-});
+if (orderSubmitBtn) {
+    orderSubmitBtn.addEventListener('click', () => {
+        if (orderItems.length === 0) return;
+        orderSubmitBtn.textContent = '✓ Sent!';
+        orderSubmitBtn.style.background = '#22c55e';
+        orderSubmitBtn.disabled = true;
+        setTimeout(() => {
+            orderItems = [];
+            updateOrderBadge();
+            closeOrderModal();
+            orderSubmitBtn.textContent = 'Send to Kitchen';
+            orderSubmitBtn.style.background = '';
+        }, 1500);
+    });
+}
 
-/* ── Menu UI Update ──────────────────────────────── */
+function triggerSubCatFlash(direction) {
+    let flash = document.getElementById('subcat-flash-overlay');
+    if (!flash) {
+        flash = document.createElement('div');
+        flash.id = 'subcat-flash-overlay';
+        flash.style.cssText = "position: fixed; top: -50px; right: -50px; width: 160px; height: 160px; background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%); border-radius: 50%; pointer-events: none; z-index: 9998; opacity: 0; filter: blur(5px);";
+        document.body.appendChild(flash);
+    }
+    gsap.killTweensOf(flash);
+    gsap.fromTo(flash,
+        { opacity: 1, scale: 1 },
+        { opacity: 0, scale: 2.5, duration: 4.0, ease: "power3.out", overwrite: "auto" }
+    );
+}
+
+/* ── Menu UI & Scroll Animation Update ────────────── */
 function updateMenuUI(color, section, isDown = true) {
+    if (!section) return;
     if (activeSectionId === section.id) return;
     activeSectionId = section.id;
 
@@ -230,8 +838,6 @@ function updateMenuUI(color, section, isDown = true) {
     const price = section.getAttribute("data-price");
     const ingredientItems = (section.getAttribute("data-ingredients") || "").split(";");
 
-    gsap.to(".fixed-bg", { backgroundColor: color, duration: 0.6, ease: "power2.inOut" });
-
     if (nameEl) {
         const ingredientsHTML = ingredientItems
             .map(item => `<div class="mask"><span class="ing-line">${item}</span></div>`)
@@ -243,121 +849,58 @@ function updateMenuUI(color, section, isDown = true) {
         ingredientsEl.innerHTML = ingredientsHTML;
 
         const categoryChanged = category !== currentCategory;
-        const oldCategory = currentCategory;
         currentCategory = category;
 
         if (categoryChanged) {
-            if (oldCategory) {
-                const oldWrapper = document.getElementById(`bg-${oldCategory}`);
-                if (oldWrapper) {
-                    const oldLabel = oldWrapper.querySelector('.bg-category-label');
-                    gsap.killTweensOf(oldLabel);
-                    gsap.to(oldLabel, { y: isDown ? "-110%" : "110%", opacity: 0, duration: 0.8, ease: "power2.in", onComplete: () => { oldWrapper.style.display = 'none'; } });
-                }
-            }
-            const newWrapper = document.getElementById(`bg-${category}`);
-            if (newWrapper) {
-                newWrapper.style.display = 'block';
-                const newLabel = newWrapper.querySelector('.bg-category-label');
-                gsap.killTweensOf(newLabel);
-                const entryYBg = isDown ? "110%" : "-110%";
-                gsap.fromTo(newLabel,
-                    { y: entryYBg, opacity: 0 },
-                    { y: "0%", opacity: 1, duration: 1.2, ease: "power3.out", delay: 0.5, overwrite: "auto" }
-                );
-            }
+            triggerSubCatFlash(isDown ? "down" : "up");
         }
 
-        const catHrefMap = {
-            "Pizza": "#category-pizza",
-            "Burger": "#category-burger",
-            "Shawarma": "#category-shawarma",
-            "Bowls": "#category-bowls"
-        };
-        const activeHref = catHrefMap[category];
-        const catNav = document.querySelector(".category-nav");
+        updateTitleDisplay(category);
+        updateNavDots();
 
-        if (catNav && activeHref) {
-            let activeCatEl = null;
-            catNav.querySelectorAll(".nav-cat-item").forEach(item => {
-                const isActive = item.getAttribute("href") === activeHref;
-                item.classList.toggle("active", isActive);
-                if (isActive) activeCatEl = item;
-            });
+        const ingLineEls = Array.from(ingredientsEl.querySelectorAll(".ing-line"));
 
-            const indicator = catNav.querySelector(".nav-indicator");
-            if (activeCatEl && indicator) {
-                indicator.style.opacity = "1";
-                indicator.style.width = `${activeCatEl.offsetWidth}px`;
-                indicator.style.height = `${activeCatEl.offsetHeight}px`;
-                indicator.style.left = `${activeCatEl.offsetLeft}px`;
-            }
-        }
+        const animElements = [];
+        if (catEl) animElements.push(catEl);
+        if (nameEl) animElements.push(nameEl);
+        if (priceEl) animElements.push(priceEl);
+        animElements.push(...ingLineEls);
 
-        const itemsToAnimate = [
-            catEl,
-            nameEl,
-            ...gsap.utils.toArray(ingredientsEl.querySelectorAll(".ing-line")),
-            priceEl
-        ].filter(el => el !== null);
-
-        gsap.killTweensOf(itemsToAnimate);
-
-        const entryY = isDown ? "110%" : "-110%";
-        const tl = gsap.timeline({ delay: 0.4 });
-
-        tl.fromTo(itemsToAnimate,
-            { y: entryY, opacity: 0 },
-            { y: "0%", opacity: 1, duration: 0.8, stagger: 0.08, ease: "power3.out", overwrite: "auto" }
+        gsap.killTweensOf(animElements);
+        gsap.fromTo(animElements,
+            { y: "150%" },
+            { y: "0%", delay: 0.1, duration: 0.8, stagger: 0.2, ease: "power3.out", overwrite: "auto" }
         );
     }
 
     if (visual) {
         gsap.killTweensOf(visual);
-        const entryY = isDown ? "120%" : "-120%";
-        gsap.fromTo(visual,
-            { y: entryY, opacity: 0 },
-            { y: "0%", opacity: 1, duration: 1.0, ease: "power3.out", overwrite: "auto" }
-        );
+        gsap.set(visual, { y: "0%", opacity: 1 });
     }
 }
 
 function hideMenuUI(section, isDown = true) {
+    if (!section) return;
     const visual = section.querySelector(".flavor-visual");
     const items = [
         section.querySelector(".mobile-category"),
         section.querySelector(".mobile-product-name"),
         ...section.querySelectorAll(".ing-line"),
         section.querySelector(".mobile-price")
-    ].filter(el => el !== null);
+    ].filter(Boolean);
 
     if (items.length === 0 && !visual) return;
 
-    // Labels are now handled globally in updateMenuUI
-
     if (items.length > 0) {
         gsap.killTweensOf(items);
-        const exitY = isDown ? "-110%" : "110%";
-        gsap.to(items, { y: exitY, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power2.in", overwrite: "auto" });
-    }
-
-    if (visual) {
-        gsap.killTweensOf(visual);
-        const exitY = isDown ? "-120%" : "120%";
-        gsap.to(visual, { y: exitY, opacity: 0, duration: 0.8, ease: "power3.in", overwrite: "auto" });
+        gsap.set(items, { y: "120%" });
     }
 
     if (activeSectionId === section.id) activeSectionId = null;
 }
 
-/* ── Init Animations ─────────────────────────────── */
+/* ── Init Scroll Animations ─────────────────────── */
 function initFlavorAnimations() {
-    gsap.to(".floating-img", {
-        y: 20, duration: 3, ease: "sine.inOut",
-        repeat: -1, yoyo: true,
-        stagger: { each: 0.5, from: "random" }
-    });
-
     const flavorSections = gsap.utils.toArray(".flavor-section");
     flavorSections.forEach(section => {
         const color = section.getAttribute('data-bg');

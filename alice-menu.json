@@ -1,0 +1,402 @@
+{
+  "main_categories": [
+    {
+      "main_category": "Sushi & Rolls",
+      "sub_categories": [
+        {
+          "category": "NIGIRI",
+          "pieces": 2,
+          "items": [
+            
+            {
+              "name": "Saké",
+              "description": "Saumon - Riz vinaigré",
+              "price": "700DA",
+              "image": "./nigiri-sake.avif"
+            },
+            {
+              "name": "Ebi Tempura",
+              "description": "Crevette tempura - Riz vinaigré",
+              "price": "700DA",
+              "image": "./nigiri-shrimp.avif"
+            },
+            {
+              "name": "Shiromizakana",
+              "description": "Poisson blanc - Riz vinaigré",
+              "price": "600DA",
+              "image": "./nigiri-white-fish.avif"
+            },
+            {
+              "name": "Abokado",
+              "description": "Avocat - Riz vinaigré",
+              "price": "600DA",
+              "image": "./nigiri-avocado.avif"
+            },
+            {
+              "name": "Pickled Radish",
+              "description": "Oshinko - Riz vinaigré",
+              "price": "600DA",
+              "image": "./nigiri-pickled-radish.avif"
+            }
+            
+          ]
+        },
+        {
+          "category": "HOSO MAKI",
+          "pieces": 6,
+          "items": [ 
+            {
+              "name": "Salmon",
+              "description": "Saumon - Riz vinaigré - Algue",
+              "price": "800DA",
+              "image": "./hosomaki-salmon.avif"
+            },
+            {
+              "name": "White Fish",
+              "description": "Poisson blanc - Riz vinaigré - Algue",
+              "price": "700DA",
+              "image": "./hosomaki-white-fish.avif"
+            },
+            
+            {
+              "name": "Shrimp Tempura",
+              "description": "Crevette tempura - Riz vinaigré - Algue",
+              "price": "800DA",
+              "image": "./hosomaki-shrimp.avif"
+            },
+            {
+              "name": "Oshinko",
+              "description": "Oshinko - Riz vinaigré - Algue",
+              "price": "600DA",
+              "image": "./hosomaki-oshinko.avif"
+            },
+            {
+              "name": "Avocado",
+              "description": "Avocat - Riz vinaigré - Algue",
+              "price": "600DA",
+              "image": "./hosomaki-avocado.avif"
+            },
+            {
+              "name": "Kanikama",
+              "description": "Surimi - Riz vinaigré - Algue",
+              "price": "600DA",
+              "image": "./hosomaki-kanikama.avif"
+            }
+          ]
+        }, 
+        {
+          "category": "FUTOMAKI",
+          "pieces": 5,
+          "items": [
+            {
+              "name": "Yasai Végétarien",
+              "description": "Avocat - Oshinko - Carotte - Concombre",
+              "price": "700DA",
+              "image": "./futomaki1.avif"
+            },
+            {
+              "name": "MoriTori Tempura",
+              "description": "Poulet - Oshinko - Concombre - Fromage",
+              "price": "800DA",
+              "image": "./futomaki2.avif"
+            },
+            {
+              "name": "Spicy Kanikama",
+              "description": "Surimi - Oshinko - Concombre",
+              "price": "900DA",
+              "image": "./futomaki3.avif"
+            },
+            {
+              "name": "FutoSaké",
+              "description": "Saumon - Avocat - Concombre",
+              "price": "1000DA",
+              "image": "./futomaki2.avif"
+            },
+            {
+              "name": "EbiMori Tempura",
+              "description": "Crevette - Oshinko - Concombre",
+              "price": "1100DA",
+              "image": "./futomaki3.avif"
+            }
+          ]
+        },
+        {
+          "category": "URAMAKI",
+          "pieces": 4,
+          "items": [
+            {
+              "name": "Katsu",
+              "description": "Poulet - Avocat - Oignon frit",
+              "price": "700DA",
+              "image": "./uramaki1.avif"
+            },
+            {
+              "name": "California",
+              "description": "Surimi - Avocat - Oignon frit",
+              "price": "800DA",
+              "image": "./uramaki2.avif"
+            },
+            {
+              "name": "White Fish",
+              "description": "Poisson blanc - Oshinko - Sésame",
+              "price": "800DA",
+              "image": "./uramaki3.avif"
+            },
+            {
+              "name": "Philadelphia",
+              "description": "Saumon - Avocat - Fromage - Sésame",
+              "price": "900DA",
+              "image": "./uramaki2.avif"
+            },
+            {
+              "name": "Ebi Tempura",
+              "description": "Crevette - Avocat - Sésame",
+              "price": "900DA",
+              "image": "./uramaki1.avif"
+            }
+          ]
+        },
+        {
+          "category": "CRISPY",
+          "pieces": 4,
+          "items": [
+            {
+              "name": "Chicken",
+              "description": "Poulet - Avocat - Concombre - Fromage",
+              "price": "800DA",
+              "image": "./crispy1.avif"
+            },
+            {
+
+              "name": "Surimi",
+              "description": "Surimi - Oshinko - Concombre - Fromage",
+              "price": "900DA",
+              "image": "./crispy2.avif"
+            },
+            {
+              "name": "White Fish",
+              "description": "Poisson blanc - Oshinko - Concombre - Fromage",
+              "price": "900DA",
+              "image": "./crispy3.avif"
+            },
+            {
+              "name": "Shrimp",
+              "description": "Crevette - Avocat - Concombre - Fromage",
+              "price": "1000DA",
+              "image": "./crispy2.avif"
+            },
+            {
+              "name": "Salmon",
+              "description": "Saumon - Avocat - Concombre - Fromage",
+              "price": "1100DA",
+              "image": "./crispy1.avif"
+            }
+          ]
+        },
+        {
+          "category": "TEMAKI",
+          "pieces": 1,
+          "items": [
+            {
+              "name": "Chicken",
+              "description": "Poulet - Oshinko - Concombre - Sésame",
+              "price": "800DA",
+              "image": "./temaki1.avif"
+            },
+            {
+              "name": "Salmon",
+              "description": "Saumon - Avocat - Concombre - Sésame",
+              "price": "1200DA",
+              "image": "./temaki2.avif"
+            }
+          ]
+        }        
+      ]
+    },
+    {
+      "main_category": "Starters & Appetizers",
+      "sub_categories": [
+        {
+          "category": "GYOZA",
+          "pieces": 5,
+          "items": [
+            {
+              "name": "Chicken",
+              "description": "Poulet haché tendre",
+              "price": "700DA",
+              "image": "./gyoza1.avif"
+            },
+            {
+              "name": "Beef",
+              "description": "Viande hachée fraîche",
+              "price": "900DA",
+              "image": "./gyoza2.avif"
+            }
+          ]
+        },
+        {
+          "category": "NEM",
+          "pieces": 3,
+          "items": [
+            {
+              "name": "Chicken",
+              "description": "Poulet haché tendre",
+              "price": "700DA",
+              "image": "./nem1.png"
+            },
+            {
+              "name": "Shrimp",
+              "description": "Viande hachée fraîche",
+              "price": "900DA",
+              "image": "./nem.avif"
+            }
+          ]
+        },
+        {
+          "category": "YAKITORI",
+          "pieces": 3,
+          "items": [
+            {
+              "name": "Beef",
+              "description": "Brochettes de filet de bœuf au cœur de fromage fondant, accompagnées de garniture",
+              "price": "1300DA",
+              "image": "./yakitori.avif"
+            }
+          ]
+        },
+        {
+          "category": "EBI FRY",
+          "pieces": null,
+          "items": [
+            {
+              "name": "Shrimp",
+              "description": "Crevettes royales panées au panko japonais, parfaitement croustillantes",
+              "price": "2100DA",
+              "image": "./ebi-fry.avif"
+            }
+          ]
+        },
+        {
+          "category": "SPRING ROLL",
+          "pieces": 2,
+          "items": [
+            {
+              "name": "Salmon",
+              "description": "Rouleaux de printemps frais au saumon, légumes croquants et herbes fraîches",
+              "price": "1200DA",
+              "image": "./spring-roll.avif"
+            },
+            {
+              "name": "Shrimp",
+              "description": "Rouleaux de printemps frais garnis de crevettes, accompagnés de légumes croquants et d’herbes aromatiques.",
+              "price": "1300DA",
+              "image": "./nem1.png"
+            }
+          ]
+        },
+        {
+          "category": "TARTARE",
+          "pieces": null,
+          "items": [
+            {
+              "name": "Salmon",
+              "description": "Saumon et avocat frais, assaisonnement délicat et saveurs fraîches.",
+              "price": "2500DA",
+              "image": "./tartare.avif"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "main_category": "Hot Mains & Bowls",
+      "sub_categories": [
+        {
+          "category": "WOK",
+          "pieces": null,
+          "items": [
+            {
+              "name": "Chicken",
+              "description": "Poulet sauté au wok avec légumes croquants, relevé d’une sauce asiatique parfumée",
+              "price": "1100DA",
+              "image": "./wok-beef.avif"
+            },
+            {
+              "name": "Beef",
+              "description": "Bœuf sauté au wok avec légumes croquants, nappé d’une sauce asiatique savoureuse",
+              "price": "1400DA",
+              "image": "./wok-chicken.avif"
+            },
+            {
+              "name": "Shrimp",
+              "description": "Crevettes sautées au wok avec légumes croquants, sublimées par une sauce asiatique délicate",
+              "price": "1700DA",
+              "image": "./wok-shrimp.avif"
+            }
+          ]
+        },
+        {
+          "category": "BOWL",
+          "pieces": null,
+          "items": [
+            {
+              "name": "Buddha Bowl - Salmon laqué",
+              "description": "Riz, légumes croquants, protéine au choix et sauce maison : un bol gourmand et équilibré, accompagné de notre sauce maison savoureuse.",
+              "price": "1100DA",
+              "image": "./bowl-salad.afiv"
+            },
+            {
+              "name": "Buddha Bowl - Chicken teriyaki",
+              "description": "Riz, légumes croquants, protéine au choix et sauce maison : un bol gourmand et équilibré, accompagné de notre sauce maison savoureuse.",
+              "price": "1100DA",
+              "image": "./bowl-salmon.afiv"
+            },
+            { "name": "Poké Bowl - Salmon", "description": "Un bol frais et gourmand, composé de riz vinaigré, légumes croquants, fruits exotiques, toppings colorés et sauce maison, avec protéine au choix",
+              "price": "1100DA",
+              "image": "./bowl-chicken.afiv"
+            },
+            { "name": "Poké Bowl - Tofu (végétarien)", "description": "Un bol frais et gourmand, composé de riz vinaigré, légumes croquants, fruits exotiques, toppings colorés et sauce maison, avec protéine au choix",
+              "price": "1100DA",
+              "image": "./bowl-tofu.afiv"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "main_category": "Desserts",
+      "sub_categories": [
+        {
+          "category": "MOUCHI",
+          "pieces": 1,
+          "items": [
+            {
+              "name": "Mange",
+              "description": null,
+              "price": "250DA",
+              "image": "./mouchi1.avif"
+            },
+            {
+              "name": "Fruits rouges",
+              "description": null,
+              "price": "200DA",
+              "image": "./mouchi2.avif"
+            },
+            {
+              "name": "Pèche",
+              "description": null,
+              "price": "200DA",
+              "image": "./mouchi1.avif"
+            },
+            {
+              "name": "Ananas",
+              "description": null,
+              "price": "150DA",
+              "image": "./mouchi2.avif"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
