@@ -357,7 +357,7 @@
             },
             { "name": "Poké Bowl - Tofu (végétarien)", "description": "Un bol frais et gourmand, composé de riz vinaigré, légumes croquants, fruits exotiques, toppings colorés et sauce maison, avec protéine au choix",
               "price": "1100DA",
-              "image": "./bowl-tofu.avif"
+              "image": "./bowl-tufo.avif"
             }
           ]
         }
@@ -374,25 +374,25 @@
               "name": "Mange",
               "description": null,
               "price": "250DA",
-              "image": "./mouchi1.png"
+              "image": "./moushi1.avif"
             },
             {
               "name": "Fruits rouges",
               "description": null,
               "price": "200DA",
-              "image": "./mouchi2.png"
+              "image": "./moushi2.avif"
             },
             {
               "name": "Pèche",
               "description": null,
               "price": "200DA",
-              "image": "./mouchi1.png"
+              "image": "./moushi1.avif"
             },
             {
               "name": "Ananas",
               "description": null,
               "price": "150DA",
-              "image": "./mouchi2.png"
+              "image": "./moushi2.avif"
             }
           ]
         }
