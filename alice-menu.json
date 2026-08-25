@@ -343,21 +343,21 @@
               "name": "Buddha Bowl - Salmon laqué",
               "description": "Riz, légumes croquants, protéine au choix et sauce maison : un bol gourmand et équilibré, accompagné de notre sauce maison savoureuse.",
               "price": "1100DA",
-              "image": "./bowl-salad.afiv"
+              "image": "./bowl-salad.avif"
             },
             {
               "name": "Buddha Bowl - Chicken teriyaki",
               "description": "Riz, légumes croquants, protéine au choix et sauce maison : un bol gourmand et équilibré, accompagné de notre sauce maison savoureuse.",
               "price": "1100DA",
-              "image": "./bowl-salmon.afiv"
+              "image": "./bowl-salmon.avif"
             },
             { "name": "Poké Bowl - Salmon", "description": "Un bol frais et gourmand, composé de riz vinaigré, légumes croquants, fruits exotiques, toppings colorés et sauce maison, avec protéine au choix",
               "price": "1100DA",
-              "image": "./bowl-chicken.afiv"
+              "image": "./bowl-chicken.avif"
             },
             { "name": "Poké Bowl - Tofu (végétarien)", "description": "Un bol frais et gourmand, composé de riz vinaigré, légumes croquants, fruits exotiques, toppings colorés et sauce maison, avec protéine au choix",
               "price": "1100DA",
-              "image": "./bowl-tofu.afiv"
+              "image": "./bowl-tofu.avif"
             }
           ]
         }
@@ -374,25 +374,25 @@
               "name": "Mange",
               "description": null,
               "price": "250DA",
-              "image": "./mouchi1.avif"
+              "image": "./mouchi1.png"
             },
             {
               "name": "Fruits rouges",
               "description": null,
               "price": "200DA",
-              "image": "./mouchi2.avif"
+              "image": "./mouchi2.png"
             },
             {
               "name": "Pèche",
               "description": null,
               "price": "200DA",
-              "image": "./mouchi1.avif"
+              "image": "./mouchi1.png"
             },
             {
               "name": "Ananas",
               "description": null,
               "price": "150DA",
-              "image": "./mouchi2.avif"
+              "image": "./mouchi2.png"
             }
           ]
         }
