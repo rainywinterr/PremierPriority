@@ -11,21 +11,21 @@
 }
 
 :root {
-    --bg-main: #f5f5f5;
-    /* Whitesmoke */
-    --bg-card: #ffffff;
-    --bg-sidebar: #ebebeb;
-    --bg-hover: #e0e0e0;
-    --text-dark: #1a1a1a;
-    --text-muted: #666666;
-    --text-faint: #999999;
-    --border: #dcdcdc;
-    --border-dark: #cccccc;
-    --danger: #d93838;
+    --bg-main: #0f1115;
+    --bg-card: #181a20;
+    --bg-sidebar: #0f1115;
+    --bg-hover: #23262f;
+    --text-dark: #f8f9fa;
+    /* Now represents light text since background is dark */
+    --text-muted: #8b929e;
+    --text-faint: #4e5564;
+    --border: #282c35;
+    --border-dark: #3a404c;
+    --danger: #ef4444;
     --sidebar-w: 230px;
     --radius: 8px;
     --radius-sm: 6px;
-    --shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 html,
@@ -398,7 +398,7 @@ body {
     min-width: 0;
 }
 
-/* Product names use custom product color */
+/* Product names */
 .item-info h3 {
     font-size: 15px;
     font-weight: 600;
@@ -406,6 +406,7 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 4px;
+    color: var(--text-dark);
 }
 
 .item-meta {
@@ -418,12 +419,8 @@ body {
 .item-price {
     font-size: 13.5px;
     font-weight: 600;
-    color: var(--text-dark);
-}
-
-.item-cal {
-    font-size: 12px;
-    color: var(--text-muted);
+    color: #d4a373;
+    /* Gold/Bronze accent for price */
 }
 
 .item-cat-badge {
@@ -431,17 +428,9 @@ body {
     font-weight: 500;
     padding: 2px 8px;
     border-radius: 4px;
-    background: var(--bg-main);
+    background: var(--bg-hover);
     border: 1px solid var(--border);
     color: var(--text-muted);
-}
-
-.item-color-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    border: 1px solid var(--border-dark);
 }
 
 /* Ingredients preview */

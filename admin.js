@@ -1,35 +1,12 @@
 /* =====================================================
    Admin Dashboard — admin.js
-   All menu data is kept in-memory. Export button
-   outputs JSON you can paste back into script1.js.
    ===================================================== */
 
-// ── Initial data (mirrors script1.js) ──────────────────
-let menuData = {
-    "Cookies": [
-        { name: "Choco Chip", price: "350 DZD", ingredients: ["Flour", "Butter", "Chocolate Chips", "Sugar"], calories: "250 kcal", img: "./VanillaCookie.png", color: "#6F4E37", tint: "#FFFaf0" },
-        { name: "Oatmeal Raisin", price: "300 DZD", ingredients: ["Oats", "Raisins", "Cinnamon", "Brown Sugar"], calories: "220 kcal", img: "./FrezCookie.png", color: "#D2691E", tint: "#FFF5EE" },
-        { name: "Double Dark", price: "400 DZD", ingredients: ["Cocoa", "Dark Chocolate", "Sea Salt"], calories: "280 kcal", img: "./ChocoCookie.png", color: "#3C2A21", tint: "#f2efe4" }
-    ],
-    "Ice Cream": [
-        { name: "Vanilla Bean", price: "450 DZD", ingredients: ["Cream", "Milk", "Madagascar Vanilla"], calories: "300 kcal", img: "./vanillaScoop.png", color: "#F3E5AB", tint: "#FFFDE7" },
-        { name: "Belgian Choco", price: "500 DZD", ingredients: ["Belgian Cocoa", "Fresh Cream"], calories: "350 kcal", img: "./ChocoScoop.png", color: "#4B3621", tint: "#EFEBE9" }
-    ],
-    "Drinks": [
-        { name: "Iced Latte", price: "400 DZD", ingredients: ["Espresso", "Milk", "Ice"], calories: "150 kcal", img: "./drinkslatte.png", color: "#C0A080", tint: "#EFEBE9" },
-        { name: "Berry Smoothie", price: "550 DZD", ingredients: ["Mixed Berries", "Yogurt", "Honey"], calories: "210 kcal", img: "./drinksfrez.png", color: "#904D77", tint: "#F3E5F5" }
-    ],
-    "Macarons": [
-        { name: "Pistachio", price: "250 DZD", ingredients: ["Almond Flour", "Pistachio Paste"], calories: "80 kcal", img: "./macaronpistach.png", color: "#93C572", tint: "#F1F8E9", bgImages: ["./BGpistach1.png", "./BGpistach2.png"] },
-        { name: "Raspberry", price: "250 DZD", ingredients: ["Raspberry Jam", "Egg Whites"], calories: "85 kcal", img: "./macaronfrez.png", color: "#E30B5C", tint: "#FCE4EC", bgImages: ["./BGfrez1.png", "./BGfrez2.png", "./BGfrez3.png"] }
-    ]
-};
-
-// ── State ───────────────────────────────────────────────
-let activeCategory = Object.keys(menuData)[0];
+let menuData = { main_categories: [] };
+let activeMainCategoryIndex = 0;
+let activeSubCategoryIndex = 0;
 let editingIndex = -1; // -1 = new item
-let dragSrcIndex = -1;
-let pendingImageDataUrl = null; // base64 from file upload
+let pendingImageDataUrl = null;
 
 // ── DOM refs ────────────────────────────────────────────
 const categoryTabsEl = document.getElementById('category-tabs');
@@ -55,14 +32,23 @@ const imagePathInput = document.getElementById('image-path');
 const itemNameInput = document.getElementById('item-name');
 const itemPriceInput = document.getElementById('item-price');
 const itemDescInput = document.getElementById('item-desc');
-const itemCalInput = document.getElementById('item-calories');
-const itemColorInput = document.getElementById('item-color');
-const colorHexEl = document.getElementById('color-hex');
-const itemTintInput = document.getElementById('item-tint');
-const tintHexEl = document.getElementById('tint-hex');
 const itemCategoryInput = document.getElementById('item-category');
 
 const toast = document.getElementById('toast');
+
+// ── Load Data ───────────────────────────────────────────
+fetch('alice-menu.json')
+    .then(res => res.json())
+    .then(data => {
+        menuData = data;
+        buildCategoryTabs();
+        buildCategorySelect();
+        renderItems();
+    })
+    .catch(err => {
+        console.error("Failed to load menu JSON", err);
+        showToast("Error loading menu data", "error");
+    });
 
 // ═══════════════════════════════════════════════════════
 // BUILD UI
@@ -70,33 +56,60 @@ const toast = document.getElementById('toast');
 
 function buildCategoryTabs() {
     categoryTabsEl.innerHTML = '';
-    const cats = Object.keys(menuData);
-    cats.forEach(cat => {
-        const li = document.createElement('li');
-        if (cat === activeCategory) li.classList.add('active');
-        const btn = document.createElement('button');
-        const dot = document.createElement('span');
-        dot.className = 'cat-dot';
-        btn.appendChild(dot);
-        btn.appendChild(document.createTextNode(cat));
-        btn.addEventListener('click', () => switchCategory(cat));
-        li.appendChild(btn);
-        categoryTabsEl.appendChild(li);
+    menuData.main_categories.forEach((mainCat, mIdx) => {
+        // Main category header (optional visual grouping)
+        const header = document.createElement('div');
+        header.style.padding = "8px 12px";
+        header.style.fontSize = "12px";
+        header.style.fontWeight = "bold";
+        header.style.color = "var(--text-faint)";
+        header.style.marginTop = "8px";
+        header.textContent = mainCat.main_category;
+        categoryTabsEl.appendChild(header);
+
+        mainCat.sub_categories.forEach((subCat, sIdx) => {
+            const li = document.createElement('li');
+            if (mIdx === activeMainCategoryIndex && sIdx === activeSubCategoryIndex) {
+                li.classList.add('active');
+            }
+            const btn = document.createElement('button');
+            const dot = document.createElement('span');
+            dot.className = 'cat-dot';
+            btn.appendChild(dot);
+            btn.appendChild(document.createTextNode(subCat.category));
+            btn.addEventListener('click', () => switchCategory(mIdx, sIdx));
+            li.appendChild(btn);
+            categoryTabsEl.appendChild(li);
+        });
     });
 }
 
 function buildCategorySelect() {
     itemCategoryInput.innerHTML = '';
-    Object.keys(menuData).forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = opt.textContent = cat;
-        itemCategoryInput.appendChild(opt);
+    menuData.main_categories.forEach((mainCat, mIdx) => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = mainCat.main_category;
+        mainCat.sub_categories.forEach((subCat, sIdx) => {
+            const opt = document.createElement('option');
+            opt.value = `${mIdx}-${sIdx}`;
+            opt.textContent = subCat.category;
+            optgroup.appendChild(opt);
+        });
+        itemCategoryInput.appendChild(optgroup);
     });
 }
 
+function getActiveSubCat() {
+    if (!menuData.main_categories[activeMainCategoryIndex]) return null;
+    return menuData.main_categories[activeMainCategoryIndex].sub_categories[activeSubCategoryIndex];
+}
+
 function renderItems() {
-    const items = menuData[activeCategory] || [];
-    currentTitleEl.textContent = activeCategory;
+    const subCat = getActiveSubCat();
+    if (!subCat) return;
+
+    const items = subCat.items || [];
+    currentTitleEl.textContent = subCat.category;
     itemCountEl.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}`;
     itemsListEl.innerHTML = '';
 
@@ -111,27 +124,31 @@ function renderItems() {
                 <span></span><span></span><span></span>
             </div>
             <span class="rank-badge">#${idx + 1}</span>
-            <img class="item-thumb" src="${item.img}" alt="${item.name}"
+            <img class="item-thumb" src="${item.image}" alt="${item.name}"
                  onerror="this.style.opacity='.3'">
             <div class="item-info">
-                <h3 style="color:${item.color || 'inherit'}">${item.name}</h3>
+                <h3>${item.name}</h3>
                 <div class="item-meta">
                     <span class="item-price">${item.price}</span>
-                    <span class="item-cal">${item.calories || ''}</span>
-                    <span class="item-cat-badge">${activeCategory}</span>
+                    <span class="item-cat-badge">${subCat.category}</span>
                 </div>
-                <p class="item-ings">${item.ingredients.join(' · ')}</p>
+                <p class="item-ings">${item.description || ''}</p>
             </div>
-            <div class="item-color-dot" style="background:${item.tint || '#fff'}"></div>
             <button class="item-edit-btn" data-idx="${idx}">Edit</button>
         `;
 
-        // Drag events
+        // Desktop Drag events
         li.addEventListener('dragstart', onDragStart);
         li.addEventListener('dragover', onDragOver);
         li.addEventListener('dragleave', onDragLeave);
         li.addEventListener('drop', onDrop);
         li.addEventListener('dragend', onDragEnd);
+
+        // Mobile / Touch Drag Events
+        const handle = li.querySelector('.drag-handle');
+        handle.addEventListener('touchstart', onTouchStart, { passive: false });
+        handle.addEventListener('touchmove', onTouchMove, { passive: false });
+        handle.addEventListener('touchend', onTouchEnd);
 
         // Edit btn
         li.querySelector('.item-edit-btn').addEventListener('click', () => openEditModal(idx));
@@ -143,8 +160,9 @@ function renderItems() {
 // ═══════════════════════════════════════════════════════
 // CATEGORY SWITCHING
 // ═══════════════════════════════════════════════════════
-function switchCategory(cat) {
-    activeCategory = cat;
+function switchCategory(mIdx, sIdx) {
+    activeMainCategoryIndex = mIdx;
+    activeSubCategoryIndex = sIdx;
     buildCategoryTabs();
     renderItems();
 }
@@ -152,6 +170,8 @@ function switchCategory(cat) {
 // ═══════════════════════════════════════════════════════
 // DRAG & DROP
 // ═══════════════════════════════════════════════════════
+let dragSrcIndex = -1;
+
 function onDragStart(e) {
     dragSrcIndex = +this.dataset.idx;
     this.classList.add('dragging');
@@ -173,21 +193,69 @@ function onDragLeave() {
 function onDrop(e) {
     e.preventDefault();
     const targetIdx = +this.dataset.idx;
-    if (dragSrcIndex === targetIdx) return;
+    finishReorder(dragSrcIndex, targetIdx);
+}
 
-    const items = menuData[activeCategory];
-    const moved = items.splice(dragSrcIndex, 1)[0];
+function onDragEnd() {
+    document.querySelectorAll('.item-card').forEach(c => c.classList.remove('dragging', 'drag-over'));
+    dragSrcIndex = -1;
+}
+
+// Mobile Touch D&D
+let touchDraggingEl = null;
+
+function onTouchStart(e) {
+    const li = e.target.closest('.item-card');
+    if (!li) return;
+    dragSrcIndex = +li.dataset.idx;
+    touchDraggingEl = li;
+    document.body.style.overflow = 'hidden'; // prevent scrolling
+    li.style.opacity = '0.5';
+}
+
+function onTouchMove(e) {
+    if (!touchDraggingEl) return;
+    e.preventDefault(); // Stop scroll
+    const touch = e.touches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    document.querySelectorAll('.item-card').forEach(c => c.classList.remove('drag-over'));
+    if (target) {
+        const dropTarget = target.closest('.item-card');
+        if (dropTarget && dropTarget !== touchDraggingEl) {
+            dropTarget.classList.add('drag-over');
+        }
+    }
+}
+
+function onTouchEnd(e) {
+    if (!touchDraggingEl) return;
+    document.body.style.overflow = '';
+    touchDraggingEl.style.opacity = '1';
+
+    const touch = e.changedTouches[0];
+    const target = document.elementFromPoint(touch.clientX, touch.clientY);
+    const dropTarget = target ? target.closest('.item-card') : null;
+
+    document.querySelectorAll('.item-card').forEach(c => c.classList.remove('drag-over'));
+
+    if (dropTarget && dropTarget !== touchDraggingEl) {
+        const targetIdx = +dropTarget.dataset.idx;
+        finishReorder(dragSrcIndex, targetIdx);
+    }
+
+    touchDraggingEl = null;
+    dragSrcIndex = -1;
+}
+
+function finishReorder(srcIdx, targetIdx) {
+    if (srcIdx === targetIdx || srcIdx < 0 || targetIdx < 0) return;
+    const items = getActiveSubCat().items;
+    const moved = items.splice(srcIdx, 1)[0];
     items.splice(targetIdx, 0, moved);
 
     renderItems();
     showToast('Order updated', 'success');
-}
-
-function onDragEnd() {
-    document.querySelectorAll('.item-card').forEach(c => {
-        c.classList.remove('dragging', 'drag-over');
-    });
-    dragSrcIndex = -1;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -201,7 +269,7 @@ function openAddModal() {
     modalDelete.classList.add('hidden');
 
     clearModalFields();
-    itemCategoryInput.value = activeCategory;
+    itemCategoryInput.value = `${activeMainCategoryIndex}-${activeSubCategoryIndex}`;
 
     showModal();
 }
@@ -210,23 +278,18 @@ function openEditModal(idx) {
     editingIndex = idx;
     pendingImageDataUrl = null;
 
-    const item = menuData[activeCategory][idx];
+    const item = getActiveSubCat().items[idx];
     modalTitle.textContent = 'Edit Item';
     modalDelete.classList.remove('hidden');
 
     // Populate fields
-    imagePathInput.value = item.img || '';
+    imagePathInput.value = item.image || '';
     itemNameInput.value = item.name || '';
     itemPriceInput.value = item.price || '';
-    itemDescInput.value = (item.ingredients || []).join(', ');
-    itemCalInput.value = item.calories || '';
-    itemColorInput.value = item.color || '#6F4E37';
-    colorHexEl.textContent = item.color || '#6F4E37';
-    itemTintInput.value = item.tint || '#ffffff';
-    tintHexEl.textContent = item.tint || '#ffffff';
-    itemCategoryInput.value = activeCategory;
+    itemDescInput.value = item.description || '';
+    itemCategoryInput.value = `${activeMainCategoryIndex}-${activeSubCategoryIndex}`;
 
-    setPreview(item.img);
+    setPreview(item.image);
     showModal();
 }
 
@@ -235,12 +298,7 @@ function clearModalFields() {
     itemNameInput.value = '';
     itemPriceInput.value = '';
     itemDescInput.value = '';
-    itemCalInput.value = '';
-    itemColorInput.value = '#6F4E37';
-    colorHexEl.textContent = '#6F4E37';
-    itemTintInput.value = '#FFFaf0';
-    tintHexEl.textContent = '#FFFaf0';
-    itemCategoryInput.value = activeCategory;
+    itemCategoryInput.value = `${activeMainCategoryIndex}-${activeSubCategoryIndex}`;
     clearPreview();
 }
 
@@ -270,39 +328,38 @@ function saveItem() {
     if (!name) { showToast('Name is required', 'error'); return; }
     if (!price) { showToast('Price is required', 'error'); return; }
 
-    // Resolve image: prefer file-upload data URL, else typed path
     const imgSrc = pendingImageDataUrl || imagePathInput.value.trim() || './placeholder.png';
-
-    const ingRaw = itemDescInput.value.trim();
-    const ingredients = ingRaw ? ingRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const description = itemDescInput.value.trim();
 
     const newItem = {
         name,
+        description,
         price,
-        ingredients,
-        calories: itemCalInput.value.trim(),
-        img: imgSrc,
-        color: itemColorInput.value,
-        tint: itemTintInput.value
+        image: imgSrc
     };
 
-    const targetCat = itemCategoryInput.value;
+    const targetCatVal = itemCategoryInput.value;
+    const [tm, ts] = targetCatVal.split('-').map(Number);
+    const targetSubCat = menuData.main_categories[tm].sub_categories[ts];
 
     if (editingIndex === -1) {
         // Add
-        if (!menuData[targetCat]) menuData[targetCat] = [];
-        menuData[targetCat].push(newItem);
-        if (targetCat !== activeCategory) switchCategory(targetCat);
+        if (!targetSubCat.items) targetSubCat.items = [];
+        targetSubCat.items.push(newItem);
+        if (tm !== activeMainCategoryIndex || ts !== activeSubCategoryIndex) {
+            switchCategory(tm, ts);
+        }
         showToast('Item added ✓', 'success');
     } else {
-        // Edit — might move to different category
-        if (targetCat === activeCategory) {
-            menuData[activeCategory][editingIndex] = newItem;
+        // Edit 
+        const currentSubCat = getActiveSubCat();
+        if (tm === activeMainCategoryIndex && ts === activeSubCategoryIndex) {
+            currentSubCat.items[editingIndex] = newItem;
         } else {
-            menuData[activeCategory].splice(editingIndex, 1);
-            if (!menuData[targetCat]) menuData[targetCat] = [];
-            menuData[targetCat].push(newItem);
-            switchCategory(targetCat);
+            currentSubCat.items.splice(editingIndex, 1);
+            if (!targetSubCat.items) targetSubCat.items = [];
+            targetSubCat.items.push(newItem);
+            switchCategory(tm, ts);
         }
         showToast('Item saved ✓', 'success');
     }
@@ -314,17 +371,18 @@ function saveItem() {
 
 function deleteItem() {
     if (editingIndex < 0) return;
-    const item = menuData[activeCategory][editingIndex];
+    const currentSubCat = getActiveSubCat();
+    const item = currentSubCat.items[editingIndex];
     if (!confirm(`Delete "${item.name}"?`)) return;
 
-    menuData[activeCategory].splice(editingIndex, 1);
+    currentSubCat.items.splice(editingIndex, 1);
     closeModal();
     renderItems();
     showToast('Item deleted', 'error');
 }
 
 // ═══════════════════════════════════════════════════════
-// IMAGE UPLOAD (file input)
+// IMAGE UPLOAD
 // ═══════════════════════════════════════════════════════
 imageInput.addEventListener('change', () => {
     const file = imageInput.files[0];
@@ -338,7 +396,6 @@ imageInput.addEventListener('change', () => {
     reader.readAsDataURL(file);
 });
 
-// Drag-over on upload area
 imageUploadArea.addEventListener('dragover', e => {
     e.preventDefault();
     imageUploadArea.classList.add('drag-active');
@@ -359,21 +416,9 @@ imageUploadArea.addEventListener('drop', e => {
     };
     reader.readAsDataURL(file);
 });
-
-// Sync path input → preview
 imagePathInput.addEventListener('input', () => {
     pendingImageDataUrl = null;
     setPreview(imagePathInput.value.trim());
-});
-
-// ═══════════════════════════════════════════════════════
-// COLOR PICKERS
-// ═══════════════════════════════════════════════════════
-itemColorInput.addEventListener('input', () => {
-    colorHexEl.textContent = itemColorInput.value;
-});
-itemTintInput.addEventListener('input', () => {
-    tintHexEl.textContent = itemTintInput.value;
 });
 
 // ═══════════════════════════════════════════════════════
@@ -381,14 +426,14 @@ itemTintInput.addEventListener('input', () => {
 // ═══════════════════════════════════════════════════════
 exportBtn.addEventListener('click', () => {
     const json = JSON.stringify(menuData, null, 4);
-    const blob = new Blob([`const menuData = ${json};\n`], { type: 'text/javascript' });
+    const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'menuData.js';
+    a.download = 'alice-menu.json';
     a.click();
     URL.revokeObjectURL(url);
-    showToast('Exported as menuData.js ✓', 'success');
+    showToast('Exported JSON ✓', 'success');
 });
 
 // ═══════════════════════════════════════════════════════
@@ -414,12 +459,9 @@ modalCancel.addEventListener('click', closeModal);
 modalSave.addEventListener('click', saveItem);
 modalDelete.addEventListener('click', deleteItem);
 
-// Close on backdrop click
 modalOverlay.addEventListener('click', e => {
     if (e.target === modalOverlay) closeModal();
 });
-
-// Keyboard: Escape closes modal
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeModal();
 });
@@ -437,13 +479,6 @@ menuToggleBtn.addEventListener('click', () => {
 });
 backdropEl.addEventListener('click', closeSidebar);
 
-// Close sidebar when a category is picked on mobile
-categoryTabsEl.addEventListener('click', () => {
-    if (window.innerWidth <= 900) closeSidebar();
+categoryTabsEl.addEventListener('click', (e) => {
+    if (window.innerWidth <= 900 && e.target.tagName === 'BUTTON') closeSidebar();
 });
-
-// ── Init ────────────────────────────────────────────────
-
-buildCategoryTabs();
-buildCategorySelect();
-renderItems();
