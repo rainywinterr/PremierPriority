@@ -219,25 +219,42 @@ function renderCategoryDropdown() {
         item.textContent = cat.category;
         item.addEventListener('click', () => {
             dropdownList.classList.add('hidden');
-            if (currentViewMode === 'scroll') {
-                const subSlug = slugify(cat.category);
-                const targetEl = document.getElementById(`category-${subSlug}`);
-                jumpToSection(targetEl);
-            } else {
-                const gridSwipeContainer = document.getElementById('grid-swipe-container');
-                if (gridSwipeContainer) {
-                    gridSwipeContainer.style.scrollBehavior = 'auto'; // Instant jump 
-                    gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
-                    gridSwipeContainer.style.scrollBehavior = '';
-                    currentGridIndex = idx;
-                    updateNavDots();
-                    updateGridArrows();
-                    updateTitleDisplay(cat.category);
+            showCategoryTransition(cat.category, () => {
+                if (currentViewMode === 'scroll') {
+                    const subSlug = slugify(cat.category);
+                    const targetEl = document.getElementById(`category-${subSlug}`);
+                    jumpToSection(targetEl);
+                } else {
+                    const gridSwipeContainer = document.getElementById('grid-swipe-container');
+                    if (gridSwipeContainer) {
+                        gridSwipeContainer.style.scrollBehavior = 'auto';
+                        gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
+                        gridSwipeContainer.style.scrollBehavior = '';
+                        currentGridIndex = idx;
+                        updateNavDots();
+                        updateGridArrows();
+                        updateTitleDisplay(cat.category);
+                    }
                 }
-            }
+            });
         });
         dropdownList.appendChild(item);
     });
+}
+
+/* ── Category Transition Overlay ─────────────────── */
+function showCategoryTransition(categoryName, onMidpoint) {
+    const overlay = document.getElementById('view-switch-transition-overlay');
+    const text = document.getElementById('view-transition-text');
+    if (!overlay) { if (onMidpoint) onMidpoint(); return; }
+    if (text) text.textContent = categoryName;
+    overlay.classList.add('show');
+    setTimeout(() => {
+        if (typeof onMidpoint === 'function') onMidpoint();
+    }, 500);
+    setTimeout(() => {
+        overlay.classList.remove('show');
+    }, 1000);
 }
 
 /* ── Fullscreen & Welcome Overlay ─────────────────── */
@@ -278,7 +295,7 @@ function openMenuView() {
     const snapContainer = document.getElementById('snap-container');
 
     currentViewMode = 'scroll';
-    showScrollView();
+    showNormalScrollView();
 
     menuView.classList.remove('hidden-slide');
 
@@ -333,20 +350,13 @@ if (viewToggleBtn) {
                 }
             }
 
-            showGridView();
+            const targetIndex = currentGridIndex;
+            showGridView(targetIndex);
 
-            const gridSwipeContainer = document.getElementById('grid-swipe-container');
-            if (gridSwipeContainer) {
-                gridSwipeContainer.style.scrollBehavior = 'auto';
-                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
-                gridSwipeContainer.style.scrollBehavior = '';
-            }
-
-            if (allCategories[currentGridIndex]) {
-                updateTitleDisplay(allCategories[currentGridIndex].category);
+            if (allCategories[targetIndex]) {
+                updateTitleDisplay(allCategories[targetIndex].category);
             }
         } else {
-            currentViewMode = 'scroll';
             const cat = allCategories[currentGridIndex];
             if (cat) {
                 const subSlug = slugify(cat.category);
@@ -363,16 +373,19 @@ if (viewToggleBtn) {
 
 function switchToScrollView(targetSectionId) {
     currentViewMode = 'scroll';
-    showScrollView();
-    updateViewToggleIcon();
 
-    const targetEl = document.getElementById(targetSectionId);
-    if (targetEl) {
-        jumpToSection(targetEl);
-    }
+    showScrollView(() => {
+        const targetEl = document.getElementById(targetSectionId);
+        if (targetEl) {
+            jumpToSection(targetEl);
+        }
+    });
+    updateViewToggleIcon();
 }
 
-function showScrollView() {
+
+
+function showNormalScrollView() {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
@@ -385,18 +398,77 @@ function showScrollView() {
     updateViewToggleIcon();
 }
 
-function showGridView() {
+function showNormalGridView() {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
     const horzNav = document.getElementById('horizontal-grid-nav');
-
     if (snap) snap.classList.add('hidden');
     if (grid) grid.classList.remove('hidden');
     if (vertNav) vertNav.classList.add('hidden');
     if (horzNav) horzNav.classList.remove('hidden');
     updateGridArrows();
     updateViewToggleIcon();
+}
+
+function showScrollView(onViewReady) {
+    const snap = document.getElementById('snap-container');
+    const grid = document.getElementById('grid-view-container');
+    const vertNav = document.getElementById('vertical-scroll-nav');
+    const horzNav = document.getElementById('horizontal-grid-nav');
+    const overlay = document.getElementById('view-switch-transition-overlay');
+    const viewTransitionText = document.getElementById('view-transition-text');
+    if (viewTransitionText) {
+        viewTransitionText.textContent = 'Scroll View';
+    }
+
+    overlay.classList.add('show');
+
+    setTimeout(() => {
+        if (snap) snap.classList.remove('hidden');
+        if (grid) grid.classList.add('hidden');
+        if (vertNav) vertNav.classList.remove('hidden');
+        if (horzNav) horzNav.classList.add('hidden');
+        updateViewToggleIcon();
+        if (typeof onViewReady === 'function') {
+            onViewReady();
+        }
+    }, 500);
+    setTimeout(() => {
+        overlay.classList.remove('show');
+    }, 1000);
+}
+
+function showGridView(snapToIndex) {
+    const snap = document.getElementById('snap-container');
+    const grid = document.getElementById('grid-view-container');
+    const vertNav = document.getElementById('vertical-scroll-nav');
+    const horzNav = document.getElementById('horizontal-grid-nav');
+    const overlay = document.getElementById('view-switch-transition-overlay');
+    const viewTransitionText = document.getElementById('view-transition-text');
+    if (viewTransitionText) {
+        viewTransitionText.textContent = 'Grid View';
+    }
+    overlay.classList.add('show');
+    setTimeout(() => {
+        if (snap) snap.classList.add('hidden');
+        if (grid) grid.classList.remove('hidden');
+        if (vertNav) vertNav.classList.add('hidden');
+        if (horzNav) horzNav.classList.remove('hidden');
+        updateViewToggleIcon();
+        // Set scroll position AFTER grid is visible so it sticks
+        if (snapToIndex !== undefined) {
+            const gridSwipeContainer = document.getElementById('grid-swipe-container');
+            if (gridSwipeContainer) {
+                gridSwipeContainer.style.scrollBehavior = 'auto';
+                gridSwipeContainer.scrollLeft = snapToIndex * gridSwipeContainer.clientWidth;
+                gridSwipeContainer.style.scrollBehavior = '';
+            }
+        }
+    }, 500);
+    setTimeout(() => {
+        overlay.classList.remove('show');
+    }, 1000);
 }
 
 function updateViewToggleIcon() {
@@ -434,7 +506,7 @@ function updateNavDots() {
                 e.preventDefault();
                 const gridSwipeContainer = document.getElementById('grid-swipe-container');
                 if (gridSwipeContainer) {
-                    gridSwipeContainer.style.scrollBehavior = 'auto'; // Instant jump
+                    gridSwipeContainer.style.scrollBehavior = 'auto';
                     gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
                     gridSwipeContainer.style.scrollBehavior = '';
                 }
@@ -543,61 +615,6 @@ function updateGridArrows() {
     if (arrowRight) arrowRight.classList.toggle('disabled', currentGridIndex >= allCategories.length - 1);
 }
 
-// Arrow click handlers
-document.addEventListener('click', (e) => {
-    const snapContainer = document.getElementById('snap-container');
-    const gridSwipeContainer = document.getElementById('grid-swipe-container');
-
-    if (e.target.closest('#scroll-arrow-up')) {
-        if (currentViewMode === 'scroll' && snapContainer) {
-            const sections = Array.from(snapContainer.querySelectorAll('.snap-section'));
-            const currentIdx = sections.findIndex(s => s.id === activeSectionId);
-            if (currentIdx > 0) {
-                const prev = sections[currentIdx - 1];
-                smoothScrollToSection(prev);
-            }
-        } else if (currentViewMode === 'grid' && gridSwipeContainer) {
-            if (currentGridIndex > 0) {
-                currentGridIndex--;
-                gridSwipeContainer.style.scrollBehavior = 'smooth';
-                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
-            }
-        }
-    }
-
-    if (e.target.closest('#scroll-arrow-down')) {
-        if (currentViewMode === 'scroll' && snapContainer) {
-            const sections = Array.from(snapContainer.querySelectorAll('.snap-section'));
-            const currentIdx = sections.findIndex(s => s.id === activeSectionId);
-            if (currentIdx < sections.length - 1) {
-                const next = sections[currentIdx + 1];
-                smoothScrollToSection(next);
-            }
-        } else if (currentViewMode === 'grid' && gridSwipeContainer) {
-            if (currentGridIndex < allCategories.length - 1) {
-                currentGridIndex++;
-                gridSwipeContainer.style.scrollBehavior = 'smooth';
-                gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
-            }
-        }
-    }
-
-    if (e.target.closest('#scroll-arrow-left') && gridSwipeContainer) {
-        if (currentGridIndex > 0) {
-            currentGridIndex--;
-            gridSwipeContainer.style.scrollBehavior = 'smooth';
-            gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
-        }
-    }
-
-    if (e.target.closest('#scroll-arrow-right') && gridSwipeContainer) {
-        if (currentGridIndex < allCategories.length - 1) {
-            currentGridIndex++;
-            gridSwipeContainer.style.scrollBehavior = 'smooth';
-            gridSwipeContainer.scrollLeft = currentGridIndex * gridSwipeContainer.clientWidth;
-        }
-    }
-});
 
 /* ── Order System & Double Click Add ─────────────── */
 const fabOrder = document.getElementById('fab-order');
@@ -645,8 +662,8 @@ function triggerBorderFlash() {
     }
     gsap.killTweensOf(flash);
     gsap.fromTo(flash,
-        { opacity: 1, boxShadow: "inset 0 0 70px 20px rgba(0, 0, 0, 0.65)", duration: 1.5 },
-        { opacity: 0, boxShadow: "inset 0 0 0px 0px rgba(255, 255, 255, 0)", duration: 3.5, ease: "power3.out" }
+        { opacity: 1, boxShadow: "inset 0 0 70px 20px rgba(0, 0, 0, 0.65)", duration: 5 },
+        { opacity: 0, boxShadow: "inset 0 0 0px 0px rgba(255, 255, 255, 0)", duration: 5, ease: "power3.out" }
     );
 }
 
@@ -834,7 +851,7 @@ function updateMenuUI(color, section, isDown = true) {
         ingredientsEl.innerHTML = ingredientsHTML;
 
         const categoryChanged = category !== currentCategory;
-        currentCategory = category; 
+        currentCategory = category;
 
         updateTitleDisplay(category);
         updateNavDots();
