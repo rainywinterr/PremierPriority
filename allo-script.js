@@ -9,6 +9,42 @@ let currentViewMode = "scroll"; // "scroll" or "grid"
 let isAnimating = false;
 let currentGridIndex = 0;
 
+let hasScrolledScroll = false;
+let hasScrolledGrid = false;
+let scrolledCategories = new Set();
+let currentCategoryIdx = 0;
+let isProgrammaticScroll = false;
+let userInteractedScroll = false;
+let isCategoryOverlayShowing = false;
+
+const categoryFoodExplanations = {
+    "NIGIRI": "Riz vinaigré façonné à la main, surmonté d'une tranche délicate de poisson frais ou de fruit de mer.",
+    "HOSO MAKI": "Petits rouleaux traditionnels entourés d'algue nori croustillante, garnis de riz et d'un seul ingrédient frais.",
+    "FUTOMAKI": "Grands rouleaux généreux garnis de multiples ingrédients savoureux, de légumes croquants et de riz vinaigré.",
+    "URAMAKI": "Rouleaux inversés avec le riz à l'extérieur, saupoudrés de sésame et entourant un cœur gourmand.",
+    "CRISPY": "Rouleaux frits et dorés au panko japonais pour un croustillant irrésistible et un cœur fondant.",
+    "TEMAKI": "Cône de feuille d'algue nori garni à la main de riz vinaigré, poisson frais et légumes croquants.",
+    "GYOZA": "Raviolis japonais poêlés, croustillants en dessous et juteux à l'intérieur.",
+    "NEM": "Rouleaux asiatiques dorés et croustillants, servis chauds avec des garnitures parfumées.",
+    "YAKITORI": "Brochettes de viande tendres grillées au feu et nappées d'une sauce teriyaki savoureuse.",
+    "EBI FRY": "Crevettes géantes panées au panko japonais et frites jusqu'à obtenir une dorure parfaite.",
+    "SPRING ROLL": "Rouleaux de printemps frais dans une feuille de riz transparente, garnis d'herbes et légumes croquants.",
+    "TARTARE": "Délicat tartare de poisson frais assaisonné d'agrumes, d'avocat et d'herbes fines.",
+    "WOK": "Plat sauté à feu vif au wok associant nouilles ou riz, légumes croquants et protéines marinées.",
+    "BOWL": "Bols gourmands et équilibrés associant riz, légumes colorés, toppings et sauce maison.",
+    "MOUCHI": "Pâtisseries japonaises moelleuses en pâte de riz, glacées ou garnies de fruits rafraîchissants."
+};
+
+function getCategoryDescription(catName) {
+    if (!catName) return "";
+    const key = catName.toUpperCase().trim();
+    if (categoryFoodExplanations[key]) return categoryFoodExplanations[key];
+    for (let k in categoryFoodExplanations) {
+        if (key.includes(k) || k.includes(key)) return categoryFoodExplanations[k];
+    }
+    return "Une sélection culinaire raffinée préparée avec des ingrédients frais de qualité.";
+}
+
 /* ── Viewport height fix ─────────────────────────── */
 function updateViewportHeight() {
     let vh = window.innerHeight * 0.01;
@@ -53,6 +89,7 @@ async function loadMenuData() {
         renderMenu();
         renderCategoryDropdown();
         renderGridView();
+        initScrollHints();
         setTimeout(() => {
             ScrollTrigger.refresh();
             initFlavorAnimations();
@@ -91,10 +128,49 @@ function renderMenu() {
         maskDiv.innerHTML = `<div class="bg-category-label">${subTitle.toUpperCase()}</div>`;
         bgMasksContainer.appendChild(maskDiv);
 
-        // Render Product Sections
+        // 1. Render Category Separator Snap Section
+        const separatorSection = document.createElement('section');
+        separatorSection.className = 'snap-section category-separator-section';
+        separatorSection.setAttribute('id', `category-${subSlug}`);
+        separatorSection.setAttribute('data-category', subTitle);
+        separatorSection.setAttribute('data-category-slug', subSlug);
+        separatorSection.setAttribute('data-cat-index', catIdx);
+
+        const catExplanation = getCategoryDescription(subTitle);
+        const previewThumbs = (cat.items || []).slice(0, 4).map(item => `
+            <img src="${item.image}" alt="${item.name}" class="preview-item-thumb">
+        `).join('');
+
+        const totalCats = allCategories.length;
+        const progressRatio = totalCats > 1 ? (catIdx / (totalCats - 1)) : 0;
+        const circumference = 439.82;
+        const strokeOffset = circumference * (1 - progressRatio);
+
+        separatorSection.innerHTML = `
+            <div class="category-separator-card">
+                <div class="separator-big-progress-ring">
+                    <svg viewBox="0 0 160 160" width="350" height="350">
+                        <circle class="ring-bg" cx="80" cy="80" r="70" />
+                        <circle class="ring-fill separator-ring-fill" cx="80" cy="80" r="70" style="stroke-dasharray: ${circumference}; stroke-dashoffset: ${strokeOffset.toFixed(2)};" />
+                    </svg>
+                </div>
+                <div class="separator-cat-title-wrapper">
+                    <p class="separator-cat-number">0${catIdx + 1}/${allCategories.length}</p>
+                    <p class="separator-category-line">catégorie</p>
+                    <h2 class="separator-cat-title">${subTitle}</h2>
+                </div>
+                <p class="separator-cat-desc">${catExplanation}</p>
+                <div class="separator-items-preview">
+                    ${previewThumbs}
+                </div>
+            </div>
+        `;
+        snapContainer.appendChild(separatorSection);
+
+        // 2. Render Product Sections
         (cat.items || []).forEach((item, itemIdx) => {
             const section = document.createElement('section');
-            const sectionId = (itemIdx === 0) ? `category-${subSlug}` : `${subSlug}-${itemIdx + 1}`;
+            const sectionId = `${subSlug}-${itemIdx + 1}`;
             section.setAttribute('id', sectionId);
 
             const bgColor = bgColors[colorIdx % bgColors.length];
@@ -146,7 +222,7 @@ function renderGridView() {
         slide.setAttribute('data-cat-index', catIdx);
 
         let itemsHTML = (cat.items || []).map((item, itemIdx) => {
-            const sectionId = (itemIdx === 0) ? `category-${subSlug}` : `${subSlug}-${itemIdx + 1}`;
+            const sectionId = `${subSlug}-${itemIdx + 1}`;
             return `
                 <div class="grid-item-card" data-section-id="${sectionId}" data-cat-index="${catIdx}">
                     <img src="${item.image}" alt="${item.name}" class="grid-item-img">
@@ -219,42 +295,101 @@ function renderCategoryDropdown() {
         item.textContent = cat.category;
         item.addEventListener('click', () => {
             dropdownList.classList.add('hidden');
-            showCategoryTransition(cat.category, () => {
-                if (currentViewMode === 'scroll') {
-                    const subSlug = slugify(cat.category);
-                    const targetEl = document.getElementById(`category-${subSlug}`);
-                    jumpToSection(targetEl);
-                } else {
-                    const gridSwipeContainer = document.getElementById('grid-swipe-container');
-                    if (gridSwipeContainer) {
-                        gridSwipeContainer.style.scrollBehavior = 'auto';
-                        gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
-                        gridSwipeContainer.style.scrollBehavior = '';
-                        currentGridIndex = idx;
-                        updateNavDots();
-                        updateGridArrows();
-                        updateTitleDisplay(cat.category);
-                    }
+            const subSlug = slugify(cat.category);
+            currentCategory = cat.category;
+            if (currentViewMode === 'scroll') {
+                const targetEl = document.getElementById(`category-${subSlug}`);
+                jumpToSection(targetEl);
+            } else {
+                const gridSwipeContainer = document.getElementById('grid-swipe-container');
+                if (gridSwipeContainer) {
+                    gridSwipeContainer.style.scrollBehavior = 'auto';
+                    gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
+                    gridSwipeContainer.style.scrollBehavior = '';
+                    currentGridIndex = idx;
+                    updateNavDots();
+                    updateGridArrows();
+                    updateTitleDisplay(cat.category);
                 }
-            });
+            }
         });
         dropdownList.appendChild(item);
     });
 }
 
 /* ── Category Transition Overlay ─────────────────── */
-function showCategoryTransition(categoryName, onMidpoint) {
+const categoryTransitionOverlay = document.getElementById('view-switch-transition-overlay');
+if (categoryTransitionOverlay) {
+    categoryTransitionOverlay.addEventListener('click', () => {
+        categoryTransitionOverlay.classList.remove('show');
+        isCategoryOverlayShowing = false;
+    });
+}
+
+function showCategoryTransition(categoryName, onMidpoint, customDesc = null) {
     const overlay = document.getElementById('view-switch-transition-overlay');
     const text = document.getElementById('view-transition-text');
+    const desc = document.getElementById('view-transition-desc');
     if (!overlay) { if (onMidpoint) onMidpoint(); return; }
+
     if (text) text.textContent = categoryName;
+    if (desc) {
+        desc.textContent = customDesc !== null ? customDesc : getCategoryDescription(categoryName);
+    }
+    isCategoryOverlayShowing = true;
     overlay.classList.add('show');
-    setTimeout(() => {
-        if (typeof onMidpoint === 'function') onMidpoint();
-    }, 500);
-    setTimeout(() => {
-        overlay.classList.remove('show');
-    }, 1000);
+    if (typeof onMidpoint === 'function') {
+        setTimeout(onMidpoint, 300);
+    }
+}
+
+/* ── Scroll Direction Hint Management ──────────── */
+function initScrollHints() {
+    const snapContainer = document.getElementById('snap-container');
+    const gridSwipeContainer = document.getElementById('grid-swipe-container');
+
+    if (snapContainer) {
+        ['wheel', 'touchmove', 'keydown'].forEach(evt => {
+            snapContainer.addEventListener(evt, () => {
+                userInteractedScroll = true;
+            }, { passive: true });
+        });
+
+        snapContainer.addEventListener('scroll', () => {
+            if (!isProgrammaticScroll && userInteractedScroll && !scrolledCategories.has(currentCategoryIdx)) {
+                scrolledCategories.add(currentCategoryIdx);
+                updateScrollHintVisibility();
+            }
+        }, { passive: true });
+    }
+
+    if (gridSwipeContainer) {
+        gridSwipeContainer.addEventListener('scroll', () => {
+            if (!hasScrolledGrid && gridSwipeContainer.scrollLeft > 10) {
+                hasScrolledGrid = true;
+                updateScrollHintVisibility();
+            }
+        }, { passive: true });
+    }
+    updateScrollHintVisibility();
+}
+
+function updateScrollHintVisibility() {
+    const scrollHint = document.getElementById('scroll-direction-hint-scroll');
+    const gridHint = document.getElementById('scroll-direction-hint-grid');
+    if (currentViewMode === 'scroll') {
+        if (scrollHint) {
+            if (scrolledCategories.has(currentCategoryIdx)) scrollHint.classList.add('hidden-hint');
+            else scrollHint.classList.remove('hidden-hint');
+        }
+        if (gridHint) gridHint.classList.add('hidden-hint');
+    } else {
+        if (gridHint) {
+            if (hasScrolledGrid) gridHint.classList.add('hidden-hint');
+            else gridHint.classList.remove('hidden-hint');
+        }
+        if (scrollHint) scrollHint.classList.add('hidden-hint');
+    }
 }
 
 /* ── Fullscreen & Welcome Overlay ─────────────────── */
@@ -286,35 +421,40 @@ document.addEventListener('click', (e) => {
     }
 });
 
-/* ── Open Menu View (scroll-through, first item) ── */
+/* ── Open Menu View (grid view, first load clean properties) ── */
 function openMenuView() {
     if (isAnimating) return;
     isAnimating = true;
 
     const menuView = document.getElementById('menu-view');
-    const snapContainer = document.getElementById('snap-container');
+    const gridSwipeContainer = document.getElementById('grid-swipe-container');
 
-    currentViewMode = 'scroll';
-    showNormalScrollView();
+    currentViewMode = 'grid';
+    currentGridIndex = 0;
 
+    showNormalGridView();
     menuView.classList.remove('hidden-slide');
 
-    const firstSection = snapContainer.querySelector('.snap-section');
-    if (firstSection && snapContainer) {
-        snapContainer.style.scrollBehavior = 'auto';
-        snapContainer.scrollTop = firstSection.offsetTop;
-        snapContainer.style.scrollBehavior = '';
-
-        activeSectionId = null;
-        currentCategory = "";
-        const color = firstSection.getAttribute('data-bg');
-        updateMenuUI(color, firstSection, true);
+    if (gridSwipeContainer) {
+        gridSwipeContainer.style.scrollBehavior = 'auto';
+        gridSwipeContainer.scrollLeft = 0;
+        gridSwipeContainer.style.scrollBehavior = '';
     }
 
+    if (allCategories && allCategories.length > 0) {
+        updateTitleDisplay(allCategories[0].category);
+        currentCategory = allCategories[0].category;
+    }
+    updateNavDots();
+
     setTimeout(() => {
+        if (gridSwipeContainer) {
+            gridSwipeContainer.scrollLeft = 0;
+        }
+        updateNavDots();
         ScrollTrigger.refresh();
         isAnimating = false;
-    }, 600);
+    }, 400);
 }
 
 /* ── Category Dropdown Toggle ────────────────────── */
@@ -389,12 +529,11 @@ function showNormalScrollView() {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
-    const horzNav = document.getElementById('horizontal-grid-nav');
 
     if (snap) snap.classList.remove('hidden');
     if (grid) grid.classList.add('hidden');
     if (vertNav) vertNav.classList.remove('hidden');
-    if (horzNav) horzNav.classList.add('hidden');
+    updateScrollHintVisibility();
     updateViewToggleIcon();
 }
 
@@ -402,12 +541,10 @@ function showNormalGridView() {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
-    const horzNav = document.getElementById('horizontal-grid-nav');
     if (snap) snap.classList.add('hidden');
     if (grid) grid.classList.remove('hidden');
     if (vertNav) vertNav.classList.add('hidden');
-    if (horzNav) horzNav.classList.remove('hidden');
-    updateGridArrows();
+    updateScrollHintVisibility();
     updateViewToggleIcon();
 }
 
@@ -415,11 +552,15 @@ function showScrollView(onViewReady) {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
-    const horzNav = document.getElementById('horizontal-grid-nav');
+    const singleDot = document.getElementById('grid-single-wrapping-dot');
     const overlay = document.getElementById('view-switch-transition-overlay');
     const viewTransitionText = document.getElementById('view-transition-text');
+    const viewTransitionDesc = document.getElementById('view-transition-desc');
     if (viewTransitionText) {
         viewTransitionText.textContent = 'Scroll View';
+    }
+    if (viewTransitionDesc) {
+        viewTransitionDesc.textContent = '';
     }
 
     overlay.classList.add('show');
@@ -428,7 +569,8 @@ function showScrollView(onViewReady) {
         if (snap) snap.classList.remove('hidden');
         if (grid) grid.classList.add('hidden');
         if (vertNav) vertNav.classList.remove('hidden');
-        if (horzNav) horzNav.classList.add('hidden');
+        if (singleDot) singleDot.classList.add('hidden');
+        updateScrollHintVisibility();
         updateViewToggleIcon();
         if (typeof onViewReady === 'function') {
             onViewReady();
@@ -443,28 +585,40 @@ function showGridView(snapToIndex) {
     const snap = document.getElementById('snap-container');
     const grid = document.getElementById('grid-view-container');
     const vertNav = document.getElementById('vertical-scroll-nav');
-    const horzNav = document.getElementById('horizontal-grid-nav');
+    const singleDot = document.getElementById('grid-single-wrapping-dot');
     const overlay = document.getElementById('view-switch-transition-overlay');
     const viewTransitionText = document.getElementById('view-transition-text');
+    const viewTransitionDesc = document.getElementById('view-transition-desc');
+
+    currentViewMode = 'grid';
+
     if (viewTransitionText) {
         viewTransitionText.textContent = 'Grid View';
+    }
+    if (viewTransitionDesc) {
+        viewTransitionDesc.textContent = '';
     }
     overlay.classList.add('show');
     setTimeout(() => {
         if (snap) snap.classList.add('hidden');
         if (grid) grid.classList.remove('hidden');
         if (vertNav) vertNav.classList.add('hidden');
-        if (horzNav) horzNav.classList.remove('hidden');
+        if (singleDot) singleDot.classList.remove('hidden');
+        updateScrollHintVisibility();
         updateViewToggleIcon();
         // Set scroll position AFTER grid is visible so it sticks
-        if (snapToIndex !== undefined) {
-            const gridSwipeContainer = document.getElementById('grid-swipe-container');
-            if (gridSwipeContainer) {
-                gridSwipeContainer.style.scrollBehavior = 'auto';
-                gridSwipeContainer.scrollLeft = snapToIndex * gridSwipeContainer.clientWidth;
-                gridSwipeContainer.style.scrollBehavior = '';
-            }
+        const targetIndex = snapToIndex !== undefined ? snapToIndex : currentGridIndex;
+        const gridSwipeContainer = document.getElementById('grid-swipe-container');
+        if (gridSwipeContainer) {
+            gridSwipeContainer.style.scrollBehavior = 'auto';
+            gridSwipeContainer.scrollLeft = targetIndex * gridSwipeContainer.clientWidth;
+            gridSwipeContainer.style.scrollBehavior = '';
         }
+        if (allCategories[targetIndex]) {
+            updateTitleDisplay(allCategories[targetIndex].category);
+            currentCategory = allCategories[targetIndex].category;
+        }
+        updateNavDots();
     }, 500);
     setTimeout(() => {
         overlay.classList.remove('show');
@@ -483,55 +637,56 @@ function updateViewToggleIcon() {
     }
 }
 
-/* ── Vertical Nav Dots (Max 5 Visible, Auto-Scroll Windowing) ── */
+/* ── Single Dot Click Event → Open Category Dropdown ─────────── */
+document.addEventListener('click', (e) => {
+    const singleDot = e.target.closest('#grid-single-wrapping-dot');
+    if (singleDot) {
+        const dropdownList = document.getElementById('category-dropdown-list');
+        if (dropdownList) dropdownList.classList.toggle('hidden');
+    }
+});
+
+/* ── Navigation Dots & Top Header Progress Circle ── */
 function updateNavDots() {
     const scrollNavContainer = document.getElementById('sub-nav');
-    const gridNavContainer = document.getElementById('grid-sub-nav');
+    const pillRingFill = document.getElementById('pill-ring-fill');
 
-    let activeDotElement = null;
+    if (pillRingFill && allCategories.length > 0) {
+        const totalCats = allCategories.length;
+        let catIndex = 0;
+        if (currentViewMode === 'grid') {
+            catIndex = currentGridIndex;
+        } else {
+            const foundIdx = allCategories.findIndex(c => c.category === currentCategory);
+            if (foundIdx !== -1) catIndex = foundIdx;
+        }
+
+        const progressRatio = totalCats > 1 ? (catIndex / (totalCats - 1)) : 0;
+        const circumference = 87.96; // 2 * PI * 14
+        const strokeOffset = circumference * (1 - progressRatio);
+        pillRingFill.style.strokeDasharray = `${circumference}`;
+        pillRingFill.style.strokeDashoffset = `${strokeOffset}`;
+    }
 
     if (currentViewMode === 'grid') {
-        if (!gridNavContainer) return;
-        gridNavContainer.innerHTML = '';
-        allCategories.forEach((cat, idx) => {
-            const isActive = (idx === currentGridIndex);
-            const dot = document.createElement('a');
-            dot.className = `sub-nav-dot-item ${isActive ? 'active' : ''}`;
-            dot.setAttribute('title', cat.category);
-            dot.innerHTML = `<span class="sub-dot-icon"></span>`;
-
-            if (isActive) activeDotElement = dot;
-
-            dot.addEventListener('click', (e) => {
-                e.preventDefault();
-                const gridSwipeContainer = document.getElementById('grid-swipe-container');
-                if (gridSwipeContainer) {
-                    gridSwipeContainer.style.scrollBehavior = 'auto';
-                    gridSwipeContainer.scrollLeft = idx * gridSwipeContainer.clientWidth;
-                    gridSwipeContainer.style.scrollBehavior = '';
-                }
-            });
-            gridNavContainer.appendChild(dot);
-        });
-
-        if (activeDotElement) {
-            const dotLeft = activeDotElement.offsetLeft;
-            const containerWidth = gridNavContainer.clientWidth;
-            gridNavContainer.scrollTo({
-                left: dotLeft - containerWidth / 2 + activeDotElement.clientWidth / 2,
-                behavior: 'smooth'
-            });
-        }
+        const vertNav = document.getElementById('vertical-scroll-nav');
+        if (vertNav) vertNav.classList.add('hidden');
     } else {
+        const vertNav = document.getElementById('vertical-scroll-nav');
+        if (vertNav) vertNav.classList.remove('hidden');
+
         if (!scrollNavContainer) return;
         scrollNavContainer.innerHTML = '';
         const currentCatData = allCategories.find(c => c.category === currentCategory);
         if (!currentCatData) return;
         const subSlug = slugify(currentCategory);
+        let activeDotElement = null;
 
         currentCatData.items.forEach((item, idx) => {
-            const sectionId = (idx === 0) ? `category-${subSlug}` : `${subSlug}-${idx + 1}`;
-            const isActive = (activeSectionId === sectionId);
+            const itemSectionId = `${subSlug}-${idx + 1}`;
+            const catSectionId = `category-${subSlug}`;
+            const isActive = (activeSectionId === itemSectionId || (idx === 0 && activeSectionId === catSectionId));
+
             const dot = document.createElement('a');
             dot.className = `sub-nav-dot-item ${isActive ? 'active' : ''}`;
             dot.setAttribute('title', item.name);
@@ -541,7 +696,7 @@ function updateNavDots() {
 
             dot.addEventListener('click', (e) => {
                 e.preventDefault();
-                const targetEl = document.getElementById(sectionId);
+                const targetEl = document.getElementById(itemSectionId);
                 jumpToSection(targetEl);
             });
             scrollNavContainer.appendChild(dot);
@@ -576,6 +731,9 @@ function jumpToSection(targetEl) {
     const snapContainer = document.getElementById('snap-container');
     if (!targetEl || !snapContainer) return;
 
+    isProgrammaticScroll = true;
+    userInteractedScroll = false;
+
     snapContainer.style.scrollBehavior = 'auto'; // Instant jump
     snapContainer.scrollTop = targetEl.offsetTop;
     snapContainer.style.scrollBehavior = '';
@@ -583,7 +741,10 @@ function jumpToSection(targetEl) {
     activeSectionId = null;
     const color = targetEl.getAttribute('data-bg');
     updateMenuUI(color, targetEl, true);
-    setTimeout(() => ScrollTrigger.refresh(), 50);
+    setTimeout(() => {
+        isProgrammaticScroll = false;
+        ScrollTrigger.refresh();
+    }, 200);
 }
 
 /* ── Smooth Scroll to Section with GSAP / ScrollTo ── */
@@ -829,13 +990,28 @@ function updateMenuUI(color, section, isDown = true) {
     if (activeSectionId === section.id) return;
     activeSectionId = section.id;
 
+    const category = section.getAttribute("data-category");
+    const catIdxAttr = section.getAttribute("data-cat-index");
+    if (catIdxAttr !== null) {
+        currentCategoryIdx = parseInt(catIdxAttr) || 0;
+    }
+    if (category) {
+        currentCategory = category;
+        updateTitleDisplay(category);
+        updateNavDots();
+        updateScrollHintVisibility();
+    }
+
+    if (section.classList.contains("category-separator-section")) {
+        return;
+    }
+
     const catEl = section.querySelector(".mobile-category");
     const nameEl = section.querySelector(".mobile-product-name");
     const priceEl = section.querySelector(".mobile-price");
     const ingredientsEl = section.querySelector(".mobile-ingredients");
     const visual = section.querySelector(".flavor-visual");
 
-    const category = section.getAttribute("data-category");
     const name = section.getAttribute("data-name");
     const price = section.getAttribute("data-price");
     const ingredientItems = (section.getAttribute("data-ingredients") || "").split(";");
@@ -849,12 +1025,6 @@ function updateMenuUI(color, section, isDown = true) {
         nameEl.innerText = name;
         priceEl.innerText = price;
         ingredientsEl.innerHTML = ingredientsHTML;
-
-        const categoryChanged = category !== currentCategory;
-        currentCategory = category;
-
-        updateTitleDisplay(category);
-        updateNavDots();
 
         const ingLineEls = Array.from(ingredientsEl.querySelectorAll(".ing-line"));
 
