@@ -8,28 +8,20 @@
     <meta name="description" content="Découvrez nos créations raffinées de sushis, maki, nigiri et boxes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
-        rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Outfit:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="stars-bg-animations.css">
-    <!-- GSAP Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 
 <body>
-    <!-- Welcome Overlay -->
     <div id="welcome-overlay" class="welcome-overlay">
         <div class="welcome-content">
             <h1 class="welcome-title">Alice Sushi</h1>
             <button id="enter-fullscreen-btn" class="welcome-enter-btn">
                 <span>Menu</span>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
@@ -37,34 +29,24 @@
         </div>
     </div>
 
-    <!-- Menu View -->
     <div id="menu-view" class="menu-view-container hidden-slide">
-        <!-- Top Menu Header -->
         <header id="top-menu-header" class="top-menu-header">
             <div class="top-menu-row">
                 <div class="top-left-controls">
-                    <!-- Category Dropdown Button -->
                     <button id="category-dropdown-btn" class="control-btn" title="Choisir catégorie">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
-                            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="3" y1="6" x2="21" y2="6"></line>
                             <line x1="3" y1="12" x2="21" y2="12"></line>
                             <line x1="3" y1="18" x2="21" y2="18"></line>
                         </svg>
                     </button>
-
-                    <!-- View Toggle Button -->
                     <button id="view-toggle-btn" class="control-btn" title="Changer la vue">
-                        <!-- Scroll icon (default) -->
-                        <svg id="icon-scroll" viewBox="0 0 24 24" width="18" height="18" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg id="icon-scroll" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                             <line x1="3" y1="9" x2="21" y2="9"></line>
                             <line x1="3" y1="15" x2="21" y2="15"></line>
                         </svg>
-                        <!-- Grid icon (hidden) -->
-                        <svg id="icon-grid" class="hidden-icon" viewBox="0 0 24 24" width="18" height="18" fill="none"
-                            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg id="icon-grid" class="hidden-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="3" width="7" height="7"></rect>
                             <rect x="14" y="3" width="7" height="7"></rect>
                             <rect x="3" y="14" width="7" height="7"></rect>
@@ -72,74 +54,48 @@
                         </svg>
                     </button>
                 </div>
-
-                <!-- Current category / title display -->
                 <div id="current-subcat-display" class="current-subcat-name"></div>
             </div>
         </header>
 
-        <!-- Category Dropdown List -->
-        <div id="category-dropdown-list" class="category-dropdown-list hidden">
-            <!-- Dynamic dropdown items populated by JS -->
-        </div>
+        <div id="category-dropdown-list" class="category-dropdown-list hidden"></div>
 
-        <!-- Vertical Middle-Left Navigation Bar (Navbar Dots + Scroll Buttons) -->
         <div id="vertical-scroll-nav" class="vertical-scroll-nav">
             <button id="scroll-arrow-up" class="scroll-arrow-btn arrow-up" title="Précédent">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="18 15 12 9 6 15"></polyline>
                 </svg>
             </button>
-            <nav id="sub-nav" class="vertical-sub-nav-dots">
-                <!-- Nav dots populated by JS (Max 5 visible at a time) -->
-            </nav>
+            <nav id="sub-nav" class="vertical-sub-nav-dots"></nav>
             <button id="scroll-arrow-down" class="scroll-arrow-btn arrow-down" title="Suivant">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
-                    stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
             </button>
         </div>
 
-        <!-- Scroll-through snap container -->
-        <div class="snap-container" id="snap-container">
-        </div>
+        <div class="snap-container" id="snap-container"></div>
 
-        <!-- Grid view container -->
         <div id="grid-view-container" class="grid-view-container hidden">
-            <!-- Horizontal Top Navigation Bar for Grid View (Navbar Dots + Left/Right Arrows) -->
             <div id="horizontal-grid-nav" class="horizontal-grid-nav hidden">
                 <button id="scroll-arrow-left" class="scroll-arrow-btn arrow-left" title="Précédent">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                <nav id="grid-sub-nav" class="horizontal-sub-nav-dots">
-                    <!-- Nav dots populated by JS -->
-                </nav>
+                <nav id="grid-sub-nav" class="horizontal-sub-nav-dots"></nav>
                 <button id="scroll-arrow-right" class="scroll-arrow-btn arrow-right" title="Suivant">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5"
-                        stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="9 6 15 12 9 18"></polyline>
                     </svg>
                 </button>
             </div>
-
-            <div id="grid-swipe-container" class="grid-swipe-container">
-            </div>
-
+            <div id="grid-swipe-container" class="grid-swipe-container"></div>
         </div>
 
-        <!-- Dynamic background category masks -->
         <div id="bg-masks-container"></div>
     </div>
 
-    <!-- Fixed background layer -->
-    <div class="fixed-bg"></div>
-
-    <!-- Floating Order Button -->
     <button id="fab-order" class="hidden" title="Voir la commande">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
@@ -149,7 +105,6 @@
         <span id="order-count-badge">0</span>
     </button>
 
-    <!-- Order Modal -->
     <div id="order-modal" class="order-modal hidden">
         <div class="order-modal-inner">
             <div class="order-modal-header">
@@ -169,7 +124,6 @@
         </div>
     </div>
 
-    <script src="stars-bg-animation.js"></script>
     <script src="script.js"></script>
 </body>
 
