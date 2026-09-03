@@ -6,19 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet">
     <title>Menus</title>
     <link rel="stylesheet" href="main-style.css">
 </head>
 
 <body>
+
+    <!-- noise canvas overlay -->
+    <canvas id="noiseCanvas"></canvas>
+
     <div class="menus-preview">
         <p id="ourWork">Our Work</p>
         <a href="./Cookies.html">Menu de Base</a>
         <a href="./pizza.html">Menu Standard</a>
         <a href="./allo.html">Allo Sushi</a>
         <a href="./manage.html">Managment</a>
-
     </div>
 
     <div class="menus section">
@@ -26,31 +30,59 @@
             <div class="animatedMenuDesc">
                 <h1 data-i18n="animatedMenuTitle">Animated Menu</h1>
                 <p data-i18n="animatedMenuDesc">
-                    Elevates client experience with smooth, engaging interactive scrolling, beautiful dish presentations, prices, and details.
+                    Elevates client experience with smooth, engaging interactive scrolling, beautiful dish
+                    presentations, prices, and details.
                 </p>
             </div>
             <div class="qrCodeDesc">
                 <h1 data-i18n="qrCodeTitle">QR Code System</h1>
-                <p data-i18n="qrCodeDesc">Instant digital access directly from table QR
-                    codes for effortless menu browsing.</p>
+                <p data-i18n="qrCodeDesc">Instant digital access directly from table QR codes for effortless menu
+                    browsing.</p>
             </div>
             <div class="orderingDesc">
                 <h1 data-i18n="orderingTitle">Ordering System</h1>
-                <p data-i18n="orderingDesc">Integrated self-ordering process allowing
-                    clients to select items and place orders seamlessly.</p>
+                <p data-i18n="orderingDesc">Integrated self-ordering process allowing clients to select items and place
+                    orders seamlessly.</p>
             </div>
             <div class="dashboardDesc">
                 <h1 data-i18n="dashboardTitle">Admin Dashboard</h1>
-                <p data-i18n="dashboardDesc">Real-time management interface to customize
-                    menu items, track active orders, and update restaurant operations easily.</p>
+                <p data-i18n="dashboardDesc">Real-time management interface to customize menu items, track active
+                    orders, and update restaurant operations easily.</p>
             </div>
         </div>
-
     </div>
+
     <div class="contact">
         <p data-i18n="theMenu">Premier Priority</p>
         <p>05 52 65 69 39</p>
     </div>
+
+    <script>
+        // ── Noise canvas ──
+        const canvas = document.getElementById('noiseCanvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawNoise() {
+            const img = ctx.createImageData(W, H);
+            const d = img.data;
+            for (let i = 0; i < d.length; i += 4) {
+                const v = Math.random() * 255 | 0;
+                d[i] = d[i + 1] = d[i + 2] = v;
+                d[i + 3] = 30; // very faint
+            }
+            ctx.putImageData(img, 0, 0);
+            requestAnimationFrame(drawNoise);
+        }
+        drawNoise();
+    </script>
 
 </body>
 

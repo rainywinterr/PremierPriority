@@ -1,1 +1,209 @@
-html{scroll-snap-type:y mandatory;scroll-behavior:smooth}body{margin:0;padding:0}.menus-preview,.menus,.contact{scroll-snap-align:start}.menus-preview{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh}p{font-family:'Fira Sans',sans-serif;font-size:20px;text-decoration:none;color:hsl(0,0%,10%);text-align:center}a{font-family:'Fira Sans',sans-serif;font-size:20px;text-decoration:none;color:hsl(0,0%,10%);text-align:center;font-weight:400;line-height:2}#ourWork{font-family:'Fira Sans',sans-serif;font-size:20px;text-decoration:none;color:hsl(0,0%,40%);text-align:center;font-weight:400}h1,h2{font-family:'Fira Sans',sans-serif;font-size:20px;font-weight:410;color:hsl(0,0%,0%);text-align:center;line-height:0.5;letter-spacing:1px}.main-type div{display:flex;flex-direction:column;justify-content:center;align-items:center;margin-top:30px}.menus{height:100vh;width:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px}.section{margin:0 auto}.contact{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh}@media (max-width:768px){p,a,.main-type{text-align:center;line-height:normal !important;font-size:15px;font-family:Arial,Helvetica,sans-serif}.menus-preview,.menus,.contact{align-items:center;text-align:center}.menus{width:95vw}}
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+
+}
+
+*:focus {
+    outline: none;
+}
+
+html {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f5f3;
+    color: #1a1a1a;
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* ── Noise overlay ── */
+#noiseCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 100;
+    mix-blend-mode: multiply;
+}
+
+/* ── Scroll sections ── */
+.menus-preview,
+.menus,
+.contact {
+    scroll-snap-align: start;
+}
+
+/* ════════════════════════════
+   SECTION 1 — Links
+════════════════════════════ */
+.menus-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 2px;
+    overflow: hidden;
+}
+
+/* Giant brand title as background */
+.menus-preview::before {
+    content: 'Premier Priority';
+    position: absolute;
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(60px, 16vw, 200px);
+    color: rgba(0, 0, 0, 0.02);
+    white-space: nowrap;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    user-select: none;
+}
+
+#ourWork {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0 0 32px 0;
+}
+
+a {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 300;
+    text-decoration: none;
+    color: #888;
+    letter-spacing: 1.5px;
+    line-height: 2.4;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #111;
+}
+
+/* ════════════════════════════
+   SECTION 2 — Features
+════════════════════════════ */
+.menus {
+    position: relative;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+
+.main-type {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+    width: 100%;
+    max-width: 520px;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+}
+
+.main-type div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1,
+h2 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 0 0 10px 0;
+}
+
+p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    color: #666;
+    text-align: center;
+    line-height: 1.8;
+    margin: 0;
+    max-width: 380px;
+}
+
+/* ════════════════════════════
+   SECTION 3 — Contact
+════════════════════════════ */
+.contact {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.contact p {
+    font-family: 'DM Sans', sans-serif;
+    color: #333;
+    text-align: center;
+    margin: 0;
+}
+
+.contact p:first-child {
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #bbb;
+}
+
+.contact p:last-child {
+    font-size: 16px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: #444;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    a {
+        font-size: 14px;
+    }
+
+    .main-type {
+        gap: 28px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+
+    .contact p:last-child {
+        font-size: 20px;
+    }
+}
