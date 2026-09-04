@@ -24,17 +24,7 @@ body {
     font-family: 'DM Sans', sans-serif;
 }
 
-/* ── Noise overlay ── */
-#noiseCanvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    pointer-events: none;
-    z-index: 100;
-    mix-blend-mode: multiply;
-}
+
 
 /* ── Scroll sections ── */
 .menus-preview,
@@ -63,7 +53,7 @@ body {
     position: absolute;
     font-family: 'Great Vibes', cursive;
     font-size: clamp(60px, 16vw, 200px);
-    color: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.01);
     white-space: nowrap;
     width: 100%;
     text-align: center;
@@ -191,6 +181,15 @@ p {
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
+    .menus-preview::before {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        transform: translate(-50%, -50%) rotate(180deg);
+        font-size: clamp(40px, 14vh, 110px);
+        top: 50%;
+        left: 50%;
+    }
+
     a {
         font-size: 14px;
     }
