@@ -16,10 +16,36 @@
 
     <div class="menus-preview">
         <p id="ourWork">Our Work</p>
-        <a href="./Cookies.html">Menu de Base</a>
-        <a href="./pizza.html">Menu Standard</a>
-        <a href="./allo.html">Allo Sushi</a>
-        <a href="./manage.html">Managment</a>
+        <div class="preview-container">
+            <a href="./Cookies.html" class="phone-preview">
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <video src="./basic-menu.mp4" autoplay loop muted playsinline></video>
+                </div>
+                <span class="preview-label">Menu de Base</span>
+            </a>
+            <a href="./pizza.html" class="phone-preview">
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <video src="./sushi.mp4" autoplay loop muted playsinline></video>
+                </div>
+                <span class="preview-label">Menu Standard</span>
+            </a>
+            <a href="./allo.html" class="phone-preview">
+                <div class="phone-frame">
+                    <div class="phone-notch"></div>
+                    <video src="./standard-menu.mp4" autoplay loop muted playsinline></video>
+                </div>
+                <span class="preview-label">Allo Sushi</span>
+            </a>
+        </div>
+        <!-- Mobile carousel dots -->
+        <div class="carousel-dots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+        </div>
+        <a href="./manage.html" style="display:none;">Management</a>
     </div>
 
     <div class="menus section">
@@ -39,7 +65,8 @@
             </div>
             <div class="orderingDesc">
                 <h1 data-i18n="orderingTitle">Ordering System</h1>
-                <p data-i18n="orderingDesc">An integrated ordering system with the menu allowing clients to just select and
+                <p data-i18n="orderingDesc">An integrated ordering system with the menu allowing clients to just select
+                    and
                     place
                     orders efficiently.</p>
             </div>
@@ -55,6 +82,110 @@
         <p data-i18n="theMenu">Premier Priority</p>
         <p>05 52 65 69 39</p>
     </div>
+    <script>
+        (function () {
+            const container = document.querySelector('.preview-container');
+            const previews = Array.from(document.querySelectorAll('.phone-preview'));
+            const dots = document.querySelectorAll('.dot');
+            let current = 0;
+            let autoTimer;
+            let startX = 0;
+            const isMobile = () => window.innerWidth <= 768;
+
+            // Positions map for 3 items: [left, center, right]
+            const positions = ['left', 'center', 'right'];
+
+            function goTo(index) {
+                current = ((index % previews.length) + previews.length) % previews.length;
+
+                if (!isMobile()) {
+                    // Desktop spotlight: assign left / center / right
+                    const order = [
+                        (current - 1 + previews.length) % previews.length, // left
+                        current,                                            // center
+                        (current + 1) % previews.length                     // right
+                    ];
+                    previews.forEach((p, i) => {
+                        const posIndex = order.indexOf(i);
+                        if (posIndex !== -1) {
+                            p.setAttribute('data-pos', positions[posIndex]);
+                        }
+                        // Clear inline mobile styles
+                        p.style.transform = '';
+                        p.style.opacity = '';
+                        p.style.pointerEvents = '';
+                        p.classList.remove('active');
+                    });
+                } else {
+                    // Mobile: single card carousel
+                    previews.forEach((p, i) => {
+                        p.removeAttribute('data-pos');
+                        p.classList.toggle('active', i === current);
+                        p.style.transform = i === current ? 'scale(1) translateX(0)' :
+                            i < current ? 'scale(0.85) translateX(-120%)' : 'scale(0.85) translateX(120%)';
+                        p.style.opacity = i === current ? '1' : '0';
+                        p.style.pointerEvents = i === current ? 'auto' : 'none';
+                    });
+                }
+                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+            }
+
+            function startAuto() {
+                stopAuto();
+                autoTimer = setInterval(() => goTo(current + 1), isMobile() ? 4000 : 5000);
+            }
+
+            function stopAuto() {
+                clearInterval(autoTimer);
+            }
+
+            // Touch swipe (mobile)
+            container.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+                stopAuto();
+            }, { passive: true });
+
+            container.addEventListener('touchend', e => {
+                const diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 50) {
+                    goTo(current + (diff > 0 ? 1 : -1));
+                }
+                startAuto();
+            }, { passive: true });
+
+            // Click side phones to focus (desktop)
+            previews.forEach((p, i) => {
+                p.addEventListener('click', (e) => {
+                    if (!isMobile() && p.getAttribute('data-pos') !== 'center') {
+                        e.preventDefault();
+                        goTo(i);
+                        stopAuto();
+                        startAuto();
+                    }
+                });
+            });
+
+            // Dot clicks
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    goTo(parseInt(dot.dataset.index));
+                    stopAuto();
+                    startAuto();
+                });
+            });
+
+            // Init
+            function init() {
+                goTo(0);
+                startAuto();
+            }
+
+            init();
+            window.addEventListener('resize', () => {
+                goTo(current);
+            });
+        })();
+    </script>
 </body>
 
 </html>
