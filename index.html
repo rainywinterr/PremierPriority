@@ -50,7 +50,7 @@
 
     <div class="menus section">
         <div class="main-type">
-            <div class="animatedMenuDesc">
+            <div class="animatedMenuDesc active">
                 <h1 data-i18n="animatedMenuTitle">Menu Experience</h1>
                 <p data-i18n="animatedMenuDesc">
                     A much better & easier client experience with smooth and simple interactive digital menu, beautiful
@@ -79,7 +79,7 @@
     </div>
 
     <div class="contact">
-        <p data-i18n="theMenu">Premier Priority</p>
+        <p data-i18n="theMenu">Digital Menu</p>
         <p>05 52 65 69 39</p>
     </div>
     <script>
@@ -97,6 +97,14 @@
 
             function goTo(index) {
                 current = ((index % previews.length) + previews.length) % previews.length;
+
+                // Adjust video playback rates: active = 1.0x, unhighlighted background = 0.7x (slower by 0.3)
+                previews.forEach((p, i) => {
+                    const video = p.querySelector('video');
+                    if (video) {
+                        video.playbackRate = (i === current) ? 1.0 : 0.7;
+                    }
+                });
 
                 if (!isMobile()) {
                     // Desktop spotlight: assign left / center / right
@@ -117,14 +125,41 @@
                         p.classList.remove('active');
                     });
                 } else {
-                    // Mobile: single card carousel
+                    // Mobile: center highlighted, left & right side items peeking
+                    const order = [
+                        (current - 1 + previews.length) % previews.length, // left
+                        current,                                            // center
+                        (current + 1) % previews.length                     // right
+                    ];
                     previews.forEach((p, i) => {
                         p.removeAttribute('data-pos');
                         p.classList.toggle('active', i === current);
-                        p.style.transform = i === current ? 'scale(1) translateX(0)' :
-                            i < current ? 'scale(0.85) translateX(-120%)' : 'scale(0.85) translateX(120%)';
-                        p.style.opacity = i === current ? '1' : '0';
-                        p.style.pointerEvents = i === current ? 'auto' : 'none';
+                        const posIndex = order.indexOf(i);
+                        if (i === current) {
+                            p.style.transform = 'scale(1) translateX(0)';
+                            p.style.opacity = '1';
+                            p.style.filter = 'none';
+                            p.style.zIndex = '3';
+                            p.style.pointerEvents = 'auto';
+                        } else if (posIndex === 0) {
+                            p.style.transform = 'translateX(-120px) scale(0.3)';
+                            p.style.opacity = '0.45';
+                            p.style.filter = 'blur(4px)';
+                            p.style.zIndex = '1';
+                            p.style.pointerEvents = 'auto';
+                        } else if (posIndex === 2) {
+                            p.style.transform = 'translateX(120px) scale(0.3)';
+                            p.style.opacity = '0.45';
+                            p.style.filter = 'blur(4px)';
+                            p.style.zIndex = '1';
+                            p.style.pointerEvents = 'auto';
+                        } else {
+                            p.style.transform = 'scale(0.5) translateX(0)';
+                            p.style.opacity = '0';
+                            p.style.filter = 'blur(5px)';
+                            p.style.zIndex = '0';
+                            p.style.pointerEvents = 'none';
+                        }
                     });
                 }
                 dots.forEach((d, i) => d.classList.toggle('active', i === current));
@@ -153,10 +188,17 @@
                 startAuto();
             }, { passive: true });
 
-            // Click side phones to focus (desktop)
+            // Click side phones to focus
             previews.forEach((p, i) => {
                 p.addEventListener('click', (e) => {
-                    if (!isMobile() && p.getAttribute('data-pos') !== 'center') {
+                    if (isMobile()) {
+                        if (i !== current) {
+                            e.preventDefault();
+                            goTo(i);
+                            stopAuto();
+                            startAuto();
+                        }
+                    } else if (p.getAttribute('data-pos') !== 'center') {
                         e.preventDefault();
                         goTo(i);
                         stopAuto();
@@ -184,6 +226,55 @@
             window.addEventListener('resize', () => {
                 goTo(current);
             });
+        })();
+
+        // Section 2 Blur & Reveal
+        (function () {
+            const featureItems = Array.from(document.querySelectorAll('.main-type > div'));
+            if (!featureItems.length) return;
+
+            let currentIndex = 0;
+            let timer = null;
+            let userHasClicked = false;
+            const CYCLE_TIME = 6000; // Auto-cycle delay in ms if user hasn't clicked
+
+            function setActiveItem(index) {
+                currentIndex = index;
+                featureItems.forEach((item, i) => {
+                    if (i === index) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            function startTimer() {
+                stopTimer();
+                if (userHasClicked) return;
+                timer = setInterval(() => {
+                    const nextIndex = (currentIndex + 1) % featureItems.length;
+                    setActiveItem(nextIndex);
+                }, CYCLE_TIME);
+            }
+
+            function stopTimer() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            featureItems.forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    userHasClicked = true;
+                    stopTimer();
+                    setActiveItem(i);
+                });
+            });
+
+            setActiveItem(0);
+            startTimer();
         })();
     </script>
 </body>
