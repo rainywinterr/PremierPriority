@@ -15,21 +15,21 @@
 <body>
 
     <div class="menus-preview">
-        <p id="ourWork">Our Work</p>
+        <p id="ourWork">Tap To Explore</p>
         <div class="preview-container">
             <a href="./Cookies.html" class="phone-preview">
                 <div class="phone-frame">
                     <div class="phone-notch"></div>
                     <video src="./cookie.mp4" autoplay loop muted playsinline></video>
                 </div>
-                <span class="preview-label">Menu de Base</span>
+                <span class="preview-label">Basic</span>
             </a>
             <a href="./pizza.html" class="phone-preview">
                 <div class="phone-frame">
                     <div class="phone-notch"></div>
                     <video src="./pizza.mp4" autoplay loop muted playsinline></video>
                 </div>
-                <span class="preview-label">Menu Standard</span>
+                <span class="preview-label">Standard</span>
             </a>
             <a href="./allo.html" class="phone-preview">
                 <div class="phone-frame">
@@ -230,6 +230,7 @@
 
         // Section 2 Blur & Reveal
         (function () {
+            const section2 = document.querySelector('.menus.section');
             const featureItems = Array.from(document.querySelectorAll('.main-type > div'));
             if (!featureItems.length) return;
 
@@ -274,7 +275,22 @@
             });
 
             setActiveItem(0);
-            startTimer();
+
+            // Use IntersectionObserver to start the timer only when Section 2 scrolls into view
+            if (section2 && 'IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            startTimer();
+                        } else {
+                            stopTimer();
+                        }
+                    });
+                }, { threshold: 0.5 });
+                observer.observe(section2);
+            } else {
+                startTimer();
+            }
         })();
     </script>
 </body>
