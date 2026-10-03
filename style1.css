@@ -163,25 +163,34 @@ body {
     align-items: center;
     overflow: visible;
     position: relative;
-    background-color: transparent !important;
+    border: 1px solid grey;
+    border-radius: 10px;
+    padding: 20px;
+    width: 80vw;
+}
+
+.enter-icon {
+    width: 30px;
+    height: 30px;
 }
 
 .Main-Category-Content {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     position: relative;
     cursor: pointer;
+    width: 80vw;
 }
+
 
 .Category-Name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 60px;
-    font-weight: 500;
-    line-height: 1;
+    font-size: 40px;
+    font-weight: 100;
     color: #161616;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
 
     position: static;
     transform: none;
@@ -189,6 +198,7 @@ body {
     white-space: nowrap;
     transition: color 0.3s ease, transform 0.3s ease;
 }
+
 
 .Main-Category-Content:hover .Category-Name {
     color: #000;
