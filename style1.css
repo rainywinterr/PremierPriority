@@ -13,9 +13,91 @@
 
 
 body {
-    background-color: whitesmoke;
+    background-color: #FAF6F0;
     overflow-x: hidden;
     width: 100%;
+    min-height: 100vh;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #2D2622;
+    position: relative;
+}
+
+/* Ambient Background Blobs */
+.ambient-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.ambient-bg .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.45;
+    animation: blobFloat 12s infinite alternate ease-in-out;
+}
+
+.ambient-bg .blob-1 {
+    width: 320px;
+    height: 320px;
+    background: #FCE1D5;
+    top: -50px;
+    left: -50px;
+}
+
+.ambient-bg .blob-2 {
+    width: 350px;
+    height: 350px;
+    background: #E4D8FD;
+    bottom: -60px;
+    right: -60px;
+    animation-delay: -6s;
+}
+
+@keyframes blobFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(30px, 40px) scale(1.1);
+    }
+}
+
+/* Header Section */
+.crumbly-header {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding-top: 35px;
+    padding-bottom: 10px;
+}
+
+.brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 56px;
+    letter-spacing: 7px;
+    color: #231F20;
+    line-height: 1;
+    margin-bottom: 4px;
+    background: linear-gradient(135deg, #231F20 0%, #5C4B43 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #8C7A70;
 }
 
 #Detail-View {
@@ -142,36 +224,83 @@ body {
     color: #333;
 }
 
-
-
 #Category-Container {
-    width: 100vw;
-    height: 100vh;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 520px;
+    min-height: calc(100vh - 120px);
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* Center horizontally */
-    gap: 50px;
+    gap: 18px;
+    padding: 15px 24px 35px 24px;
 }
 
 .Category-Item {
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    overflow: visible;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 14px 18px;
     position: relative;
-    border: 1px solid grey;
-    border-radius: 10px;
-    padding: 20px;
-    width: 80vw;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    cursor: pointer;
 }
 
-.enter-icon {
-    width: 30px;
-    height: 30px;
+.Category-Item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--category-color, #D4A373);
+    border-radius: 4px 0 0 4px;
+    transition: width 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.Category-Item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 140px;
+    height: 100%;
+    background: radial-gradient(circle at right center, var(--category-color-light, rgba(212, 163, 115, 0.2)), transparent 70%);
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.35s ease;
+}
+
+.Category-Item[data-category="Cookies"] {
+    --category-color: #D4A373;
+    --category-color-light: rgba(212, 163, 115, 0.25);
+}
+
+.Category-Item[data-category="Glaces"] {
+    --category-color: #7BB686;
+    --category-color-light: rgba(123, 182, 134, 0.25);
+}
+
+.Category-Item[data-category="Boissons"] {
+    --category-color: #9D72FF;
+    --category-color-light: rgba(157, 114, 255, 0.25);
+}
+
+.Category-Item[data-category="Macarons"] {
+    --category-color: #FF7FA6;
+    --category-color-light: rgba(255, 127, 166, 0.25);
+}
+
+.Category-Item:active {
+    transform: translateY(0);
 }
 
 .Main-Category-Content {
@@ -179,30 +308,73 @@ body {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
     position: relative;
+    z-index: 2;
     cursor: pointer;
-    width: 80vw;
 }
 
+.Category-Info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.Category-Thumb-Wrapper {
+    width: 62px;
+    height: 62px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.Category-Thumb {
+    width: 84%;
+    height: 84%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.12));
+}
+
+.Category-Text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
 
 .Category-Name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    font-weight: 100;
-    color: #161616;
-    letter-spacing: 3px;
-
-    position: static;
-    transform: none;
-    z-index: 5;
-    white-space: nowrap;
-    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 34px;
+    letter-spacing: 2.5px;
+    color: #1F1B18;
+    line-height: 1;
 }
 
+.Category-Badge {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7D726A;
+    letter-spacing: 0.3px;
+}
 
-.Main-Category-Content:hover .Category-Name {
-    color: #000;
-    transform: scale(1.05);
+.Category-Action {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.03);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.enter-icon {
+    width: 20px;
+    height: 20px;
 }
 
 #Floating-BG-Container {

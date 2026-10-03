@@ -6,36 +6,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-    <title>Crumbly</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <title>Cookies</title>
     <link rel="stylesheet" href="style1.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 
 <body>
+    <!-- Ambient Background Decorations -->
+    <div class="ambient-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="crumbly-header">
+        <h1 class="brand-title">CRUMBLY</h1>
+        <p class="brand-subtitle">Gourmandises & Douceurs</p>
+    </header>
+
     <div id="Category-Container">
         <div class="Category-Item" data-color="#D4A373" data-category="Cookies">
             <div class="Main-Category-Content">
-                <p class="Category-Name">COOKIES</p>
-                <img class="enter-icon" src="enter-category.svg">
+                <div class="Category-Info">
+                    <div class="Category-Thumb-Wrapper">
+                        <img src="./VanillaCookie.png" alt="Cookies" class="Category-Thumb Main-Category-Image">
+                    </div>
+                    <div class="Category-Text">
+                        <p class="Category-Name">COOKIES</p>
+                        <span class="Category-Badge">3 Recettes Artisanales</span>
+                    </div>
+                </div>
+                <div class="Category-Action">
+                    <img class="enter-icon" src="enter-category.svg" alt="Explorer">
+                </div>
             </div>
         </div>
         <div class="Category-Item" data-color="#B5CFB7" data-category="Glaces">
             <div class="Main-Category-Content">
-                <p class="Category-Name">GLACES</p>
-                <img class="enter-icon" src="enter-category.svg">
+                <div class="Category-Info">
+                    <div class="Category-Thumb-Wrapper">
+                        <img src="./vanillaScoop.png" alt="Glaces" class="Category-Thumb Main-Category-Image">
+                    </div>
+                    <div class="Category-Text">
+                        <p class="Category-Name">GLACES</p>
+                        <span class="Category-Badge">2 Saveurs Onctueuses</span>
+                    </div>
+                </div>
+                <div class="Category-Action">
+                    <img class="enter-icon" src="enter-category.svg" alt="Explorer">
+                </div>
             </div>
         </div>
         <div class="Category-Item" data-color="#C9B1FF" data-category="Boissons">
             <div class="Main-Category-Content">
-                <p class="Category-Name">BOISSONS</p>
-                <img class="enter-icon" src="enter-category.svg">
+                <div class="Category-Info">
+                    <div class="Category-Thumb-Wrapper">
+                        <img src="./drinkslatte.png" alt="Boissons" class="Category-Thumb Main-Category-Image">
+                    </div>
+                    <div class="Category-Text">
+                        <p class="Category-Name">BOISSONS</p>
+                        <span class="Category-Badge">Cafés & Rafraîchissements</span>
+                    </div>
+                </div>
+                <div class="Category-Action">
+                    <img class="enter-icon" src="enter-category.svg" alt="Explorer">
+                </div>
             </div>
         </div>
         <div class="Category-Item" data-color="#FFB3C6" data-category="Macarons">
             <div class="Main-Category-Content">
-                <p class="Category-Name">MACARONS</p>
-                <img class="enter-icon" src="enter-category.svg">
+                <div class="Category-Info">
+                    <div class="Category-Thumb-Wrapper">
+                        <img src="./macaronpistach.png" alt="Macarons" class="Category-Thumb Main-Category-Image">
+                    </div>
+                    <div class="Category-Text">
+                        <p class="Category-Name">MACARONS</p>
+                        <span class="Category-Badge">Parfums Gourmands</span>
+                    </div>
+                </div>
+                <div class="Category-Action">
+                    <img class="enter-icon" src="enter-category.svg" alt="Explorer">
+                </div>
             </div>
         </div>
     </div>
@@ -45,7 +98,7 @@
         <div id="Floating-BG-Container"></div>
         <img src="./goback.svg" alt="" id="Close-Btn">
         <div id="Detail-List">
-            <!-- Items will be injected here by script.js -->
+            <!-- Items will be injected here by script1.js -->
         </div>
     </div>
 
