@@ -22,28 +22,25 @@
                     <div class="phone-notch"></div>
                     <video src="./cookie.mp4" autoplay loop muted playsinline></video>
                 </div>
-                <span class="preview-label">Basic</span>
             </a>
             <a href="./pizza.html" class="phone-preview">
                 <div class="phone-frame">
                     <div class="phone-notch"></div>
                     <video src="./pizza.mp4" autoplay loop muted playsinline></video>
                 </div>
-                <span class="preview-label">Standard</span>
             </a>
             <a href="./allo.html" class="phone-preview">
                 <div class="phone-frame">
                     <div class="phone-notch"></div>
                     <video src="./allo.mp4" autoplay loop muted playsinline></video>
                 </div>
-                <span class="preview-label">Allo Sushi</span>
             </a>
         </div>
-        <!-- Mobile carousel dots -->
-        <div class="carousel-dots">
-            <span class="dot active" data-index="0"></span>
-            <span class="dot" data-index="1"></span>
-            <span class="dot" data-index="2"></span>
+        <!-- Tab strip -->
+        <div class="preview-tabs">
+            <button class="preview-tab active" data-index="0">Basic</button>
+            <button class="preview-tab" data-index="1">Standard</button>
+            <button class="preview-tab" data-index="2">Allo Sushi</button>
         </div>
         <a href="./manage.html" style="display:none;">Management</a>
     </div>
@@ -79,153 +76,55 @@
     </div>
 
     <div class="contact">
-        <p data-i18n="theMenu">Digital Menu</p>
         <p>05 52 65 69 39</p>
     </div>
     <script>
         (function () {
-            const container = document.querySelector('.preview-container');
             const previews = Array.from(document.querySelectorAll('.phone-preview'));
-            const dots = document.querySelectorAll('.dot');
+            const tabs = Array.from(document.querySelectorAll('.preview-tab'));
             let current = 0;
-            let autoTimer;
-            let startX = 0;
-            const isMobile = () => window.innerWidth <= 768;
 
-            // Positions map for 3 items: [left, center, right]
-            const positions = ['left', 'center', 'right'];
+            // pos: 'center' | 'left' | 'right'
+            function setPos(el, pos) {
+                el.setAttribute('data-pos', pos);
+            }
 
             function goTo(index) {
-                current = ((index % previews.length) + previews.length) % previews.length;
-
-                // Adjust video playback rates: active = 1.0x, unhighlighted background = 0.7x (slower by 0.3)
+                current = index;
+                const n = previews.length;
+                // center = current, right = next, left = previous
                 previews.forEach((p, i) => {
                     const video = p.querySelector('video');
-                    if (video) {
-                        video.playbackRate = (i === current) ? 1.0 : 0.7;
+                    if (video) video.playbackRate = (i === current) ? 1.0 : 0.6;
+
+                    if (i === current) {
+                        setPos(p, 'center');
+                        p.style.pointerEvents = 'auto';
+                    } else if (i === (current + 1) % n) {
+                        setPos(p, 'right');
+                        p.style.pointerEvents = 'auto';
+                    } else {
+                        setPos(p, 'left');
+                        p.style.pointerEvents = 'auto';
                     }
                 });
 
-                if (!isMobile()) {
-                    // Desktop spotlight: assign left / center / right
-                    const order = [
-                        (current - 1 + previews.length) % previews.length, // left
-                        current,                                            // center
-                        (current + 1) % previews.length                     // right
-                    ];
-                    previews.forEach((p, i) => {
-                        const posIndex = order.indexOf(i);
-                        if (posIndex !== -1) {
-                            p.setAttribute('data-pos', positions[posIndex]);
-                        }
-                        // Clear inline mobile styles
-                        p.style.transform = '';
-                        p.style.opacity = '';
-                        p.style.pointerEvents = '';
-                        p.classList.remove('active');
-                    });
-                } else {
-                    // Mobile: center highlighted, left & right side items peeking
-                    const order = [
-                        (current - 1 + previews.length) % previews.length, // left
-                        current,                                            // center
-                        (current + 1) % previews.length                     // right
-                    ];
-                    previews.forEach((p, i) => {
-                        p.removeAttribute('data-pos');
-                        p.classList.toggle('active', i === current);
-                        const posIndex = order.indexOf(i);
-                        if (i === current) {
-                            p.style.transform = 'scale(1) translateX(0)';
-                            p.style.opacity = '1';
-                            p.style.filter = 'none';
-                            p.style.zIndex = '3';
-                            p.style.pointerEvents = 'auto';
-                        } else if (posIndex === 0) {
-                            p.style.transform = 'translateX(-120px) scale(0.3)';
-                            p.style.opacity = '0.45';
-                            p.style.filter = 'blur(4px)';
-                            p.style.zIndex = '1';
-                            p.style.pointerEvents = 'auto';
-                        } else if (posIndex === 2) {
-                            p.style.transform = 'translateX(120px) scale(0.3)';
-                            p.style.opacity = '0.45';
-                            p.style.filter = 'blur(4px)';
-                            p.style.zIndex = '1';
-                            p.style.pointerEvents = 'auto';
-                        } else {
-                            p.style.transform = 'scale(0.5) translateX(0)';
-                            p.style.opacity = '0';
-                            p.style.filter = 'blur(5px)';
-                            p.style.zIndex = '0';
-                            p.style.pointerEvents = 'none';
-                        }
-                    });
-                }
-                dots.forEach((d, i) => d.classList.toggle('active', i === current));
+                tabs.forEach((t, i) => t.classList.toggle('active', i === current));
             }
 
-            function startAuto() {
-                stopAuto();
-                autoTimer = setInterval(() => goTo(current + 1), isMobile() ? 4000 : 5000);
-            }
-
-            function stopAuto() {
-                clearInterval(autoTimer);
-            }
-
-            // Touch swipe (mobile)
-            container.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-                stopAuto();
-            }, { passive: true });
-
-            container.addEventListener('touchend', e => {
-                const diff = startX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 50) {
-                    goTo(current + (diff > 0 ? 1 : -1));
-                }
-                startAuto();
-            }, { passive: true });
-
-            // Click side phones to focus
+            // Click a wing phone → bring it center
             previews.forEach((p, i) => {
                 p.addEventListener('click', (e) => {
-                    if (isMobile()) {
-                        if (i !== current) {
-                            e.preventDefault();
-                            goTo(i);
-                            stopAuto();
-                            startAuto();
-                        }
-                    } else if (p.getAttribute('data-pos') !== 'center') {
-                        e.preventDefault();
-                        goTo(i);
-                        stopAuto();
-                        startAuto();
-                    }
+                    if (i !== current) { e.preventDefault(); goTo(i); }
                 });
             });
 
-            // Dot clicks
-            dots.forEach(dot => {
-                dot.addEventListener('click', () => {
-                    goTo(parseInt(dot.dataset.index));
-                    stopAuto();
-                    startAuto();
-                });
+            // Click a tab
+            tabs.forEach((t, i) => {
+                t.addEventListener('click', () => goTo(i));
             });
 
-            // Init
-            function init() {
-                goTo(0);
-                startAuto();
-            }
-
-            init();
-            window.addEventListener('resize', () => {
-                goTo(current);
-            });
+            goTo(0);
         })();
 
         // Section 2 Blur & Reveal
@@ -237,7 +136,7 @@
             let currentIndex = 0;
             let timer = null;
             let userHasClicked = false;
-            const CYCLE_TIME = 6000; // Auto-cycle delay in ms if user hasn't clicked
+            const CYCLE_TIME = 6000;
 
             function setActiveItem(index) {
                 currentIndex = index;
@@ -276,7 +175,6 @@
 
             setActiveItem(0);
 
-            // Use IntersectionObserver to start the timer only when Section 2 scrolls into view
             if (section2 && 'IntersectionObserver' in window) {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
