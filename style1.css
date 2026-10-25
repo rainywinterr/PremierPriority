@@ -432,3 +432,45 @@ body {
     background-position: center;
     will-change: transform, opacity;
 }
+
+
+/* The container must anchor the absolutely positioned images */
+.floatingBarContainer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Floating image particles */
+.Floating-Item {
+    position: absolute;
+    z-index: 0;
+    transform-origin: center;
+    backface-visibility: hidden;
+}
+
+@keyframes floatingMotion {
+    0% {
+        translate: 0 0;
+        rotate: 0deg;
+    }
+
+    50% {
+        translate: var(--float-x) var(--float-y);
+        rotate: var(--float-rotate);
+    }
+
+    100% {
+        translate:
+            calc(var(--float-x) * -0.6)
+            calc(var(--float-y) * -0.7);
+        rotate: calc(var(--float-rotate) * -0.6);
+    }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .Floating-Item {
+        animation: floatingMotion !important;
+    }
+}

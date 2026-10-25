@@ -8,7 +8,7 @@ const menuData = {
             "calories": "250 kcal",
             "img": "./VanillaCookie.png", // Change your item picture here
             "color": "#6F4E37",
-            "tint": "#FFFaf0",
+            "tint": "#fdf0d5ff",
             "bgImages":["./BGcookieone1.png","./BGcookieone2.png","choco1.png","choco2.png","choco3.png"]
         },
         {
@@ -18,7 +18,7 @@ const menuData = {
             "calories": "220 kcal",
             "img": "./FrezCookie.png", // Change your item picture here
             "color": "#D2691E",
-            "tint": "#FFF5EE",
+            "tint": "#fcdec9ff",
             "bgImages":["avoine1.png","avoine2.png","avoine3.png","raisins1.png","raisins2.png"]
             
         },
@@ -29,7 +29,7 @@ const menuData = {
             "calories": "280 kcal",
             "img": "./ChocoCookie.png", // Change your item picture here
             "color": "#3C2A21",
-            "tint": "#f2efe4",
+            "tint": "#ffe4c0ff",
             "bgImages":["choco1.png","choco2.png","choco3.png","choco1.png","choco2.png",]
         }
     ],
@@ -204,91 +204,181 @@ function updateItemCounter(index, total) {
         detailItemCounter.textContent = `${index + 1} / ${total}`;
     }
 }
+//backround images animation
+// function _rand(min, max) {
+//     return Math.floor(Math.random() * (max - min + 1)) + min;
+// }
 
-// ── FLOATING BACKGROUND IMAGES MANAGEMENT ──────────────────────────────────
-function _rand(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+// function _randomPositions() {
+//     const zones = [
+//         // Top area
+//         () => ({ top: `${_rand(3, 14)}%`, left: `${_rand(3, 18)}%` }),
+//         () => ({ top: `${_rand(3, 14)}%`, left: `${_rand(27, 43)}%` }),
+//         () => ({ top: `${_rand(3, 14)}%`, right: `${_rand(27, 43)}%` }),
+//         () => ({ top: `${_rand(3, 14)}%`, right: `${_rand(3, 18)}%` }),
 
-function _randomPositions() {
-    const zones = [
-        () => ({ top: `${_rand(5, 20)}%`, left: `${_rand(2, 14)}%` }),   // Top Left
-        () => ({ top: `${_rand(5, 20)}%`, right: `${_rand(2, 14)}%` }),  // Top Right
-        () => ({ top: `${_rand(32, 55)}%`, left: `${_rand(1, 10)}%` }),  // Middle Left
-        () => ({ top: `${_rand(32, 55)}%`, right: `${_rand(1, 10)}%` }), // Middle Right
-        () => ({ bottom: `${_rand(5, 20)}%`, left: `${_rand(5, 22)}%` }), // Bottom Left
-        () => ({ bottom: `${_rand(5, 20)}%`, right: `${_rand(5, 22)}%` }),// Bottom Right
-    ];
+//         // Middle area
+//         () => ({ top: `${_rand(25, 40)}%`, left: `${_rand(2, 13)}%` }),
+//         () => ({ top: `${_rand(25, 40)}%`, left: `${_rand(25, 40)}%` }),
+//         () => ({ top: `${_rand(25, 40)}%`, right: `${_rand(25, 40)}%` }),
+//         () => ({ top: `${_rand(25, 40)}%`, right: `${_rand(2, 13)}%` }),
 
-    // Fisher-Yates Shuffle
-    for (let i = zones.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [zones[i], zones[j]] = [zones[j], zones[i]];
-    }
-    return zones.slice(0, 3).map(fn => fn());
-}
+//         // Lower-middle area
+//         () => ({ top: `${_rand(52, 65)}%`, left: `${_rand(5, 20)}%` }),
+//         () => ({ top: `${_rand(52, 65)}%`, right: `${_rand(5, 20)}%` }),
 
-const STAGGER_OUT = 55;
-const STAGGER_IN = 90;
+//         // Bottom area
+//         () => ({ bottom: `${_rand(3, 12)}%`, left: `${_rand(25, 43)}%` }),
+//         () => ({ bottom: `${_rand(3, 12)}%`, right: `${_rand(25, 43)}%` })
+//     ];
 
-function showFloatingImages(itemData, direction) {
-    if (!floatingBarContainer) return;
+//     // Fisher-Yates Shuffle
+//     for (let i = zones.length - 1; i > 0; i--) {
+//         const j = Math.floor(Math.random() * (i + 1));
+//         [zones[i], zones[j]] = [zones[j], zones[i]];
+//     }
 
-    const outY = direction === 'down' ? '-110vh' : '110vh';
-    const inY = direction === 'down' ? '110vh' : '-110vh';
+//     const count = _rand(10, 12);
+//     return zones.slice(0, count).map(fn => fn());
+// }
 
-    const images = (itemData && itemData.bgImages)
-        ? itemData.bgImages
-        : ['./BGfrez1.png', './BGfrez2.png', './BGfrez3.png'];
+// const STAGGER_OUT = 35;
+// const STAGGER_IN = 65;
 
-    // 1. Staggered slide-out of old images
-    const oldFloaters = Array.from(floatingBarContainer.querySelectorAll('.Floating-Item'));
-    oldFloaters.forEach((el, i) => {
-        const delay = i * STAGGER_OUT;
-        el.style.transition = `transform 0.45s ${delay}ms cubic-bezier(0.4,0,1,1)`;
-        el.style.transform = `translateY(${outY})`;
-    });
+// function showFloatingImages(itemData, direction) {
+//     if (!floatingBarContainer) return;
 
-    setTimeout(() => oldFloaters.forEach(el => el.remove()), (oldFloaters.length * STAGGER_OUT) + 460);
+//     const outY = direction === 'down' ? '-35vh' : '35vh';
+//     const inY = direction === 'down' ? '35vh' : '-35vh';
 
-    // 2. Create new images at random peripheral positions
-    const positions = _randomPositions();
-    const newDivs = images.map((src, i) => {
-        const div = document.createElement('div');
-        div.className = 'Floating-Item';
-        div.style.backgroundImage = `url("${src}")`;
-        Object.assign(div.style, positions[i] || positions[0]);
-        div.style.transition = 'none';
-        div.style.transform = `translateY(${inY})`;
-        floatingBarContainer.appendChild(div);
-        return div;
-    });
+//     const images = (itemData && itemData.bgImages)
+//         ? itemData.bgImages
+//         : ['./BGfrez1.png', './BGfrez2.png', './BGfrez3.png'];
 
-    // 3. Force reflow, then apply slide-in animation
-    newDivs.forEach(div => void div.getBoundingClientRect());
-    newDivs.forEach((div, i) => {
-        const delay = i * STAGGER_IN;
-        div.style.transition = `transform 0.65s ${delay}ms cubic-bezier(0.22,1,0.36,1)`;
-        div.style.transform = 'translateY(0)';
-    });
-}
+//     if (!images.length) return;
 
-// ── INITIALIZER ─────────────────────────────────────────────────────────────
-(function init() {
-    categoryItems.forEach(item => {
-        const trigger = item.querySelector('.Main-Category-Image, .Main-Category-Content');
-        if (trigger) {
-            trigger.addEventListener('click', () => {
-                const name = item.dataset.category;
-                setTimeout(() => {
-                    const items = menuData[name] || [];
-                    if (items.length > 0) {
-                        floatingBarContainer.innerHTML = '';
-                        showFloatingImages(items[0], 'down');
-                        updateItemCounter(0, items.length);
-                    }
-                }, 50);
-            });
-        }
-    });
-})();
+//     // Repeat supplied images to create 10-12 particles
+//     const count = _rand(10, 12);
+//     const repeatedImages = Array.from(
+//         { length: count },
+//         (_, i) => images[i % images.length]
+//     );
+
+//     // 1. Smooth slide-out with fade
+//     const oldFloaters = Array.from(
+//         floatingBarContainer.querySelectorAll('.Floating-Item')
+//     );
+
+//     oldFloaters.forEach((el, i) => {
+//         el.style.animation = 'none';
+//         el.style.transition =
+//             `transform 0.7s ${i * STAGGER_OUT}ms cubic-bezier(0.4, 0, 0.2, 1), ` +
+//             `opacity 1s ${i * STAGGER_OUT}ms ease`;
+
+//         // Preserve the current visual state before transitioning
+//         void el.offsetWidth;
+
+//         requestAnimationFrame(() => {
+//             el.style.transform =
+//                 `translate3d(0, ${outY}, 0) scale(0.88)`;
+//             el.style.opacity = '0';
+//         });
+//     });
+
+//     // Remove old images after their exit animation
+//     setTimeout(() => {
+//         oldFloaters.forEach(el => el.remove());
+//     }, 850 + oldFloaters.length * STAGGER_OUT);
+
+//     // 2. Create new images at distributed screen positions
+//     const positions = _randomPositions();
+
+//     const newDivs = repeatedImages.map((src, i) => {
+//         const div = document.createElement('div');
+//         div.className = 'Floating-Item';
+//         div.style.backgroundImage = `url("${src}")`;
+
+//         Object.assign(div.style, positions[i]);
+
+//         div.style.position = 'absolute';
+//         div.style.margin = '0';
+//         div.style.width = `${_rand(55, 105)}px`;
+//         div.style.height = `${_rand(55, 105)}px`;
+//         div.style.backgroundSize = 'contain';
+//         div.style.backgroundPosition = 'center';
+//         div.style.backgroundRepeat = 'no-repeat';
+
+//         // Keep the particles subtle and non-interactive
+//         const opacity = 1;
+//         div.style.opacity = '0';
+//         div.style.pointerEvents = 'none';
+//         div.style.willChange = 'transform, translate, rotate, opacity';
+
+//         // Independent floating movement
+//         div.style.setProperty('--float-x', `${_rand(-18, 18)}px`);
+//         div.style.setProperty('--float-y', `${_rand(-24, 24)}px`);
+//         div.style.setProperty('--float-rotate', `${_rand(-12, 12)}deg`);
+//         div.style.setProperty('--float-duration', `${_rand(5, 10)}s`);
+//         div.style.setProperty('--float-delay', `${_rand(-10, 0)}s`);
+//         div.dataset.opacity = opacity;
+
+//         div.style.transform =
+//             `translate3d(0, ${inY}, 0) scale(0.88)`;
+//         div.style.transition = 'none';
+
+//         floatingBarContainer.appendChild(div);
+
+//         return div;
+//     });
+
+//     // 3. Apply initial styles before starting entrance transitions
+//     newDivs.forEach(div => void div.offsetWidth);
+
+//     newDivs.forEach((div, i) => {
+//         const delay = i * STAGGER_IN;
+
+//         div.style.transition =
+//             `transform 1s ${delay}ms cubic-bezier(0.16, 1, 0.3, 1), ` +
+//             `opacity 1s ${delay}ms ease-out`;
+
+//         requestAnimationFrame(() => {
+//             div.style.transform = 'translate3d(0, 0, 0) scale(1)';
+//             div.style.opacity = div.dataset.opacity;
+//         });
+
+//         // 4. Start floating after the entrance completes
+//         setTimeout(() => {
+//             if (!div.isConnected) return;
+
+//             div.style.transition = 'none';
+//             div.style.animation =
+//                 'floatingMotion var(--float-duration) ease-in-out ' +
+//                 'var(--float-delay) infinite alternate';
+//         }, 1100 + delay);
+//     });
+// }
+
+// // ── INITIALIZER ─────────────────────────────────────────────────────────────
+// (function init() {
+//     categoryItems.forEach(item => {
+//         const trigger = item.querySelector(
+//             '.Main-Category-Image, .Main-Category-Content'
+//         );
+
+//         if (trigger) {
+//             trigger.addEventListener('click', () => {
+//                 const name = item.dataset.category;
+
+//                 setTimeout(() => {
+//                     const items = menuData[name] || [];
+
+//                     if (items.length > 0) {
+//                         floatingBarContainer.innerHTML = '';
+//                         showFloatingImages(items[0], 'down');
+//                         updateItemCounter(0, items.length);
+//                     }
+//                 }, 50);
+//             });
+//         }
+//     });
+// })();
