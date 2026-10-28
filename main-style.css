@@ -115,7 +115,7 @@ body {
 
 /* ── Left wing: angled inward — offset left from center anchor ── */
 .phone-preview[data-pos="left"] {
-    transform: translateX(calc(-50% - 210px)) translateZ(-80px) rotateY(28deg) scale(0.78);
+    transform: translateX(calc(-50% - 150px)) translateZ(-80px) rotateY(28deg) rotate(-15deg) scale(0.7);
     opacity: 0.52;
     filter: brightness(0.8) grayscale(0.12);
     z-index: 3;
@@ -123,18 +123,11 @@ body {
 
 /* ── Right wing: angled inward — offset right from center anchor ── */
 .phone-preview[data-pos="right"] {
-    transform: translateX(calc(-50% + 210px)) translateZ(-80px) rotateY(-28deg) scale(0.78);
+    transform: translateX(calc(-50% + 150px)) translateZ(-80px) rotateY(-28deg) rotate(15deg) scale(0.7);
     opacity: 0.52;
     filter: brightness(0.8) grayscale(0.12);
     z-index: 3;
 }
-
-.phone-preview[data-pos="left"]:hover,
-.phone-preview[data-pos="right"]:hover {
-    opacity: 0.8;
-    filter: brightness(0.92) grayscale(0);
-}
-
 
 /* Phone frame */
 .phone-frame {
@@ -206,6 +199,7 @@ body {
 /* Tab strip */
 .preview-tabs {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 6px;
     margin-top: 32px;
@@ -392,10 +386,11 @@ p {
     color: #333;
     text-align: center;
     margin: 0;
+    font-size:10px;
 }
 
 .contact p:first-child {
-    font-size: 9px;
+    font-size: 18px;
     font-weight: 400;
     letter-spacing: 5px;
     text-transform: uppercase;
@@ -426,11 +421,11 @@ p {
     }
 
     .phone-preview[data-pos="left"] {
-        transform: translateX(calc(-50% - 148px)) translateZ(-60px) rotateY(30deg) scale(0.5);
+        transform: translateX(calc(-50% - 120px)) translateZ(-60px) rotateY(30deg) rotate(-15deg) scale(0.5);
     }
 
     .phone-preview[data-pos="right"] {
-        transform: translateX(calc(-50% + 148px)) translateZ(-60px) rotateY(-30deg) scale(0.5);
+        transform: translateX(calc(-50% + 120px)) translateZ(-60px) rotateY(-30deg) rotate(15deg) scale(0.5);
     }
 
     .preview-tabs {
@@ -453,6 +448,6 @@ p {
     }
 
     .contact p:last-child {
-        font-size: 20px;
+        font-size: 12px;
     }
 }
