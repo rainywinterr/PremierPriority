@@ -152,7 +152,7 @@ detailList.addEventListener("scroll", () => {
     if (index !== lastIndex) {
         lastIndex = index;
         if (currentCategoryItems[index]) {
-            showFloatingImages(currentCategoryItems[index], dir);
+            // showFloatingImages(currentCategoryItems[index], dir);
             updateItemCounter(index, currentCategoryItems.length);
         }
     }

@@ -10,10 +10,10 @@
             requestBill: "Request Bill",
             needNapkins: "Need Napkins",
             checkOrderStatus: "Check Order Status",
-            orderPreparing: "Order in Progress: Preparing in Kitchen...",
-            serverNotified: "A server has been notified and will be at your table shortly.",
+            orderPreparing: "Preparing in Kitchen...",
+            serverNotified: "A server will be at your table shortly.",
             billSent: "Your bill request has been sent to the cashier.",
-            napkinsSent: "Napkins request sent. We will bring them to your table.",
+            napkinsSent: "We will bring Napkins to your table.",
             diningPreference: "Dining Preference",
             takeAllOut: "Take All Out",
             eatAllHere: "Eat All Here",
@@ -27,8 +27,8 @@
             size: "Size",
             crust: "Crust",
             extras: "Extras",
-            notification: "Notification",
-            orderSubmitted: "Order sent to kitchen! Preparation underway.",
+            notification: "",
+            orderSubmitted: "Order sent to kitchen",
             // Common Categories
             cookiesCat: "COOKIES",
             glacesCat: "ICE CREAM",
@@ -350,15 +350,33 @@
             document.head.appendChild(link);
         }
 
+        // Ensure Noto Sans Arabic Google Font is injected
+        if (!document.querySelector("link[href*='Noto+Sans+Arabic']")) {
+            const preconnect1 = document.createElement('link');
+            preconnect1.rel = 'preconnect';
+            preconnect1.href = 'https://fonts.googleapis.com';
+            document.head.appendChild(preconnect1);
+
+            const preconnect2 = document.createElement('link');
+            preconnect2.rel = 'preconnect';
+            preconnect2.href = 'https://fonts.gstatic.com';
+            preconnect2.crossOrigin = 'anonymous';
+            document.head.appendChild(preconnect2);
+
+            const fontLink = document.createElement('link');
+            fontLink.rel = 'stylesheet';
+            fontLink.href = 'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap';
+            document.head.appendChild(fontLink);
+        }
+
         // 1. Language & Fullscreen Modal
         const modalHTML = `
             <div id="addons-start-modal">
                 <div class="addons-modal-box">
-                    <h2 id="addons-modal-title">Choose Language / Langue</h2>
                     <div class="addons-btn-group" id="addons-lang-btns">
-                        <button class="addons-btn" data-val="en"><span>🇬🇧</span> English</button>
-                        <button class="addons-btn" data-val="fr"><span>🇫🇷</span> Français</button>
-                        <button class="addons-btn" data-val="ar"><span>🇩🇿</span> العربية</button>
+                        <button class="addons-btn" data-val="en">English</button>
+                        <button class="addons-btn" data-val="fr">Français</button>
+                        <button class="addons-btn" data-val="ar">العربية</button>
                     </div>
                 </div>
             </div>
@@ -393,9 +411,8 @@
 
             <div id="addons-order-tracker">
                 <div class="addons-status-dot"></div>
-                <div class="addons-tracker-text addons-txt" data-key="orderPreparing">Order in Progress: Preparing in Kitchen...</div>
+                <div class="addons-tracker-text addons-txt" data-key="orderPreparing">Preparing in Kitchen - </div>
                 <div class="addons-tracker-time-pill" id="addons-timer-pill">
-                    <span class="timer-icon">⏱️</span>
                     <span id="addons-timer-countdown">15:00</span>
                 </div>
             </div>
@@ -414,11 +431,11 @@
 
             // HTML Direction for Arabic RTL
             document.documentElement.setAttribute('lang', lang);
-            if (lang === 'ar') {
-                document.documentElement.setAttribute('dir', 'rtl');
-            } else {
-                document.documentElement.setAttribute('dir', 'ltr');
-            }
+            // if (lang === 'ar') {
+            //     document.documentElement.setAttribute('dir', 'rtl');
+            // } else {
+            //     document.documentElement.setAttribute('dir', 'ltr');
+            // }
 
             // Update modal title
             const mTitle = document.getElementById('addons-modal-title');
@@ -492,7 +509,7 @@
                 e.stopPropagation();
                 applyLanguage(chip.dataset.lang);
                 const dict = translations[chip.dataset.lang];
-                window.showPopoutNotification(`Language changed / Langue modifiée`, 'info', dict.notification);
+                // window.showPopoutNotification(`Language changed / Langue modifiée`, 'info', dict.notification);
             });
         });
 
@@ -560,7 +577,7 @@
             clearTimeout(trackerHideTimer);
             trackerHideTimer = setTimeout(() => {
                 tracker.classList.remove('visible');
-            }, 8000);
+            }, 5000);
         });
 
         // Trigger order tracker and pop-out notification when order submit button is clicked
@@ -569,12 +586,12 @@
             orderSubmitBtn.addEventListener('click', () => {
                 const dict = translations[currentLang] || translations.en;
                 window.showPopoutNotification(dict.orderSubmitted);
-                tracker.classList.add('visible');
+                // tracker.classList.add('visible');
                 startTimerPillCountdown();
                 clearTimeout(trackerHideTimer);
-                trackerHideTimer = setTimeout(() => {
-                    tracker.classList.remove('visible');
-                }, 8000);
+                // trackerHideTimer = setTimeout(() => {
+                //     tracker.classList.remove('visible');
+                // }, 5000);
             });
         }
 
@@ -599,7 +616,7 @@
                 globalBar.innerHTML = `
                     <span class="addons-takeout-label">${dict.diningPreference}</span>
                     <button id="addons-toggle-all-takeout" class="addons-takeout-btn ${globalTakeoutState ? 'active' : ''}">
-                        <span>🛍️</span> ${globalTakeoutState ? dict.eatAllHere : dict.takeAllOut}
+                        ${globalTakeoutState ? dict.eatAllHere : dict.takeAllOut}
                     </button>
                 `;
                 orderList.insertBefore(globalBar, orderList.firstChild);
@@ -609,7 +626,7 @@
                     const toggleBtn = document.getElementById('addons-toggle-all-takeout');
                     if (toggleBtn) {
                         toggleBtn.classList.toggle('active', globalTakeoutState);
-                        toggleBtn.innerHTML = globalTakeoutState ? `<span>🍽️</span> ${dict.eatAllHere}` : `<span>🛍️</span> ${dict.takeAllOut}`;
+                        toggleBtn.innerHTML = globalTakeoutState ? `${dict.eatAllHere}` : `${dict.takeAllOut}`;
                     }
 
                     // Update all items
